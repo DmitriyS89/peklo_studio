@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
@@ -14,16 +15,20 @@ import java.util.List;
 public class Task4Controller {
     private final Task4Service task4Service;
 
-    @GetMapping("/run")
-    public String runTask4(@RequestParam String urlFromFront, @RequestParam String protocol, Model model){
-        String baseUrl = task4Service.getBaseUrl(urlFromFront,protocol);
+    @PostMapping("/run")
+    public String runTask4(@RequestParam String urlFromFront, @RequestParam String protocol, Model model) {
+        String baseUrl = task4Service.getBaseUrl(urlFromFront, protocol);
         List<Results4Task> results = task4Service.results(baseUrl);
-        model.addAttribute("results",results);
-        return "redirect:tool_4/result";
+        model.addAttribute("results", results);
+        model.addAttribute("error", "ok");
+        return "tool_4";
     }
 
     @GetMapping("result")
-    public String tool4(){
+    public String tool4(@RequestParam(name = "error", required = false, defaultValue = "NULL") String clientError,
+                        Model model){
+        String error = "NULL".equals(clientError) ? "null" : clientError;
+        model.addAttribute("error", error);
         return "tool_4";
     }
 }
