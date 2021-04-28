@@ -1,5 +1,6 @@
 package com.peklo.peklo.models.task_4;
 
+import com.peklo.peklo.exceptions.UrlNotConnection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +17,7 @@ public class Task4Controller {
     private final Task4Service task4Service;
 
     @PostMapping("/run")
-    public String runTask4(@RequestParam String urlFromFront, @RequestParam String protocol, Model model) {
+    public String runTask4(@RequestParam String urlFromFront, @RequestParam String protocol, Model model) throws UrlNotConnection {
         String baseUrl = task4Service.getBaseUrl(urlFromFront, protocol);
         List<Results4Task> results = task4Service.results(baseUrl);
         model.addAttribute("results", results);
