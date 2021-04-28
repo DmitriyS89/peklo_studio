@@ -27,9 +27,8 @@ public class Task3Service {
     private static String BASE_URL;
     private static final String urlForExcel = "C:\\Users\\User\\GitClones\\peklo_studio\\results.xlsx";
 
-    public List<Task3Element> run(String url) throws UrlNotConnection {
+    public List<Task3Element> run(Document document){
         List<Task3Element> lists = new ArrayList<>();
-        Document document = getJSoupConnection(url);
         for (Element element : document.getElementsByTag("a")){
             lists.add(getValues(element));
         }

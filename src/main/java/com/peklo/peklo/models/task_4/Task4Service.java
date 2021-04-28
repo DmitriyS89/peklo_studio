@@ -1,6 +1,7 @@
 package com.peklo.peklo.models.task_4;
 
 import com.peklo.peklo.exceptions.ConnectionNotFound;
+import com.peklo.peklo.exceptions.UrlNotConnection;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -34,14 +35,14 @@ Task4Service {
             baseUrl = url;
         }
     }
-    public  String getBaseUrl(String urlFromFront, String protocol) {
+    public  String getBaseUrl(String urlFromFront, String protocol) throws UrlNotConnection {
         checkUrl(urlFromFront, protocol);
         try {
             URL url = new URL(baseUrl);
             url.openStream();
             return url.getHost();
         } catch (IOException e) {
-            throw new ConnectionNotFound();
+            throw new UrlNotConnection();
         }
     }
 
