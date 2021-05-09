@@ -21,16 +21,17 @@
         <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
         <h1 class="h3 mb-3 fw-normal">Создайте новый пароль</h1>
         <div class="form-floating">
-            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="password">
+            <input type="password" class="form-control" name="password" id="pswd1" placeholder="password">
             <label for="floatingPassword">Пароль</label>
         </div>
 
         <div class="form-floating">
-            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="password">
+            <input type="password" class="form-control" name="password" id="pswd2" placeholder="password">
             <label for="floatingPassword">Подтвердите пароль</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Далее</button>
     </form>
 </main>
+<script src="js/CheckPasswords.js"></script>
 </body>
 </html>
