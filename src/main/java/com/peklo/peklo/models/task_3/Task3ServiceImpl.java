@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class Task3ServiceImpl implements Task3Service {
     private static final String STR_NULL = "NULL";
     public static final Task3Element NULL_ELEMENT = new Task3Element(STR_NULL, STR_NULL);
-    private static final String urlForExcel = "C:\\savedExcel\\results.xlsx";
+    private static final String urlForExcel = "peklo_studio\\results.xlsx";
 
     @Override
     public List<Task3Element> getLinks(Document document) {
@@ -45,32 +45,27 @@ public class Task3ServiceImpl implements Task3Service {
 
     @Override
     public List<Task3Element> filterPatterns(List<Task3Element> elements, SiteWithDomain site) {
-        Pattern p1 = getCompile("%s://%s.%s%s", "\\w+", "\\w+", site.getDomain_2rd(), "\\.." + "\\w+");
-        Pattern p2 = getCompile("\\w+", site.getDomain_2rd(), "\\w+\\z");
-        Pattern p3 = getCompile("\\w+", site.getDomain_2rd(), "\\w+[/]");
-        Pattern p4 = getCompile("\\w+", site.getDomain_2rd() + "\\z");
+        Pattern p1 = getCompile("^%s://%s\\.%s\\.%s\\.%s", "\\w+", "\\w+", "\\w+", site.getDomain_1rd(), "\\w+");
+        Pattern p2 = getCompile("^%s://%s\\.%s\\.%s", "\\w+", "\\w+", site.getDomain_1rd(), "\\w+");
+        Pattern p3 = getCompile("^%s://%s\\.%s", "\\w+", site.getDomain_1rd(), "\\w+");
 
         return elements.stream()
                 .filter(value -> !p1  .matcher(value.getHref()).find())
                 .filter(value -> !p2  .matcher(value.getHref()).find())
                 .filter(value -> !p3  .matcher(value.getHref()).find())
-                .filter(value -> !p4  .matcher(value.getHref()).find())
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Pattern getCompile(String url, String protocol, String domain3, String domain2, String domain1) {
-        return Pattern.compile(String.format(url, protocol, domain3, domain2, domain1), Pattern.MULTILINE);
+    public Pattern getCompile(String url, String protocol, String domain3, String domain2, String domain1, String domain0) {
+        return Pattern.compile(String.format(url, protocol, domain3, domain2, domain1, domain0), Pattern.MULTILINE);
     }
 
-    @Override
-    public Pattern getCompile(String protocol, String domain2, String domain1) {
-        return Pattern.compile(String.format("%s://%s.%s", protocol, domain2, domain1), Pattern.MULTILINE);
+    public Pattern getCompile(String url, String protocol, String domain2, String domain1, String domain0) {
+        return Pattern.compile(String.format(url, protocol, domain2, domain1, domain0), Pattern.MULTILINE);
     }
 
-    @Override
-    public Pattern getCompile(String protocol, String domain2) {
-        return Pattern.compile(String.format("%s://%s", protocol, domain2), Pattern.MULTILINE);
+    public Pattern getCompile(String url, String protocol, String domain1, String domain0) {
+        return Pattern.compile(String.format(url, protocol, domain1, domain0), Pattern.MULTILINE);
     }
 
     @Override
@@ -105,10 +100,12 @@ public class Task3ServiceImpl implements Task3Service {
             URI uri = new URI(url);
             String host = uri.getHost();
             String[] domains = host.split("\\.");
-            if (domains.length == 3)
-                return new SiteWith3rdDomain(uri.getScheme(), domains[0], domains[1], domains[2]);// в тз сказано что только 3 домена
+            if (domains.length == 4)
+                return new SiteWith3rdDomain(uri.getScheme(), domains[0], domains[1], domains[2], domains[3]);
+            else if (domains.length == 3)
+                return new SiteWith3rdDomain(uri.getScheme(), STR_NULL, domains[0], domains[1], domains[2]);
             else if (domains.length == 2)
-                return new SiteWith3rdDomain(uri.getScheme(), STR_NULL, domains[0], domains[1]);
+                return new SiteWith3rdDomain(uri.getScheme(), STR_NULL, STR_NULL, domains[0], domains[1]);
             else
                 throw new UrlNotCorrect();
         } catch (URISyntaxException e) {
