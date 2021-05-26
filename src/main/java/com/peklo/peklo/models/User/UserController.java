@@ -1,5 +1,8 @@
 package com.peklo.peklo.models.User;
 
+import com.peklo.peklo.exceptions.TokenNotFound;
+import com.peklo.peklo.models.token.Token;
+import com.peklo.peklo.models.token.TokenService;
 import com.peklo.peklo.utils.Roles;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final TokenService tokenService;
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false, defaultValue = "false") Boolean error, Model model) {
@@ -65,13 +69,15 @@ public class UserController {
             return "register";
         }
 
-        if (!userService.addUser(UserWithPasswordDto.fromDTO(user))) {
+        User dto = UserWithPasswordDto.fromDTO(user);
+        if (!userService.addUser(dto)) {
             model.addAttribute("usernameError", "User exists!");
             return "register";
         }
 
-
-        return "redirect:/login";
+        Token token = tokenService.saveToken(dto, tokenService.makeToken());
+//        userService.sendMessage(dto, token.getToken());
+        return "redirect:activation";
     }
 
     static Map<String, String> getErrors(BindingResult bindingResult) {
@@ -86,4 +92,22 @@ public class UserController {
     public String identify() {
         return "forgotPassword";
     }
+
+    @GetMapping("/activation")
+    public String confirmRegister(@RequestParam(defaultValue = "null") String accept, Model model) {
+        model.addAttribute("accept", accept);
+        return "confirmRegister";
+    }
+
+    @PostMapping("/activation")
+    public String confirmRegister(@RequestParam Integer token) {
+        if (tokenService.findToken(token)) {
+            Token userToken = tokenService.getToken(token);
+            userService.changeUserActivate(userToken);
+            tokenService.deleteToken(userToken);
+            return "redirect:login";
+        } else
+            throw new TokenNotFound();
+    }
+
 }
