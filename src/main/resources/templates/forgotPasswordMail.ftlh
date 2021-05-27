@@ -17,17 +17,16 @@
 </head>
 <body class="text-center">
 <main class="form-signin">
-    <form action="/resetPassword" method="get">
+    <form action="/identify" method="post">
         <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
         <h1 class="h3 mb-3 fw-normal">Восстановить пароль</h1>
         <div class="form-floating">
-            <input type="hidden" name="userEmail" value="${userEmail?string}">
             <#if accept == "error">
-                <input type="text" class="form-control" name="token" id="floatingInput" placeholder="Не правильный токен!">
+                <input type="email" class="form-control" name="userEmail" id="floatingInput" placeholder="Адрес не найден!">
             <#else>
-                <input type="text" class="form-control" name="token" id="floatingInput">
+                <input type="email" class="form-control" name="userEmail" id="floatingInput">
             </#if>
-            <label for="floatingInput">Введите код,отправленный на вашу электронную почту</label>
+            <label for="floatingInput">Введите вашу электронную почту</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Далее</button>
         <#if _csrf??>
