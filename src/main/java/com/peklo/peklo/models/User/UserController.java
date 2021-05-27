@@ -1,5 +1,6 @@
 package com.peklo.peklo.models.User;
 
+import com.peklo.peklo.exceptions.TokenNotAccepted;
 import com.peklo.peklo.exceptions.TokenNotFound;
 import com.peklo.peklo.models.token.Token;
 import com.peklo.peklo.models.token.TokenService;
@@ -10,17 +11,19 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
+@Validated
 @Controller
 @AllArgsConstructor
 @RequestMapping("/")
@@ -88,8 +91,18 @@ public class UserController {
         return bindingResult.getFieldErrors().stream().collect(collector);
     }
 
+    @PostMapping("/identify")
+    public String identifyPost(@RequestParam String userEmail) {
+        User user = userService.findByEmail(userEmail);
+        Token token = tokenService.saveToken(user, tokenService.makeToken());
+        //userService.sendMessage(dto, token.getToken());
+        return "redirect:identify?userEmail=" + user.getEmail();
+    }
+
     @GetMapping("/identify")
-    public String identify() {
+    public String identify(@RequestParam(defaultValue = "null") String accept, @RequestParam String userEmail, Model model) {
+        model.addAttribute("userEmail", userEmail);
+        model.addAttribute("accept", accept);
         return "forgotPassword";
     }
 
@@ -110,4 +123,27 @@ public class UserController {
             throw new TokenNotFound();
     }
 
+    @GetMapping("/forgot")
+    public String forgotPassword(@RequestParam(defaultValue = "null") String accept, Model model) {
+        model.addAttribute("accept", accept);
+        return "forgotPasswordMail";
+    }
+
+    @PostMapping("/newPassword")
+    public String changePassword(@RequestParam @NotBlank String password, @RequestParam String userEmail){
+        User user = userService.findByEmail(userEmail);
+        userService.changeUserPassword(user, password);
+        return "redirect:login";
+    }
+
+    @GetMapping("/resetPassword")
+    public String resetPassword(@RequestParam String userEmail, @RequestParam Integer token,  Model model){
+        if (tokenService.findToken(token)) {
+            Token userToken = tokenService.getToken(token);
+            tokenService.deleteToken(userToken);
+            model.addAttribute("userEmail", userEmail);
+            return "newPassword";
+        } else
+            throw new TokenNotAccepted(userEmail);
+    }
 }

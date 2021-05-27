@@ -1,5 +1,6 @@
 package com.peklo.peklo.models.User;
 
+import com.peklo.peklo.exceptions.UserMailNotFound;
 import com.peklo.peklo.models.token.Token;
 import com.peklo.peklo.models.token.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,8 @@ public class UserService {
 
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email)
+                .orElseThrow(UserMailNotFound::new);
     }
 
     public boolean addUser(User user) {
@@ -56,4 +58,8 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void changeUserPassword(User user, String password) {
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
 }
