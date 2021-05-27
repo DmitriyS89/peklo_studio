@@ -16,30 +16,34 @@
 
 </head>
 <body class="text-center">
-
 <main class="form-signin">
-    <form  action="/login" method="post">
+    <form action="/singup" method="post">
         <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
-        <h1 class="h3 mb-3 fw-normal">Авторизация</h1>
+        <h1 class="h3 mb-3 fw-normal">Регистариция</h1>
 
         <div class="form-floating">
-            <input type="email" class="form-control" name="username" id="floatingInput" placeholder="name@example.com">
+            <input type="email" class="form-control" name="email" id="floatingInput" placeholder="name@example.com">
             <label for="floatingInput">Email</label>
         </div>
         <div class="form-floating">
-            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Пароль">
+            <input type="text" class="form-control" name="username" id="floatingInput" placeholder="username">
+            <label for="floatingInput">Имя пользователя</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" name="password" id="pswd1" placeholder="password">
             <label for="floatingPassword">Пароль</label>
         </div>
 
+        <div class="form-floating">
+            <input type="password" class="form-control " name="password2" id="pswd2" placeholder="password">
+            <label for="floatingPassword">Подтвердите пароль</label>
+        </div>
         <#if _csrf??>
             <input type="hidden" name="${(_csrf.parameterName)!'csrf'}" value="${(_csrf.token)!'--no-token--'}"/>
         </#if>
-
-        <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Войти</button>
-        <a href="/singup" class="forgot">У вас нет аккаунта?</a>
-        <a href="/forgot" class="forgot">Забыл пароль?</a>
-        <p class="mt-5 mb-3 year">&copy;2021</p>
+        <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Далее</button>
     </form>
 </main>
+<script src="js/CheckPasswords.js"></script>
 </body>
 </html>

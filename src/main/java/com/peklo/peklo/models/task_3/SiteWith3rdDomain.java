@@ -10,4 +10,5 @@ public class SiteWith3rdDomain implements SiteWithDomain {
     private String domain_3rd;
     private String domain_2rd;
     private String domain_1rd;
+    private String domain_0rd;
 }

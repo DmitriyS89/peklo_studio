@@ -16,30 +16,26 @@
 
 </head>
 <body class="text-center">
-
 <main class="form-signin">
-    <form  action="/login" method="post">
+    <form action="/newPassword" method="post">
         <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
-        <h1 class="h3 mb-3 fw-normal">Авторизация</h1>
-
+        <h1 class="h3 mb-3 fw-normal">Создайте новый пароль</h1>
+        <input type="hidden" name="userEmail" value="${userEmail}">
         <div class="form-floating">
-            <input type="email" class="form-control" name="username" id="floatingInput" placeholder="name@example.com">
-            <label for="floatingInput">Email</label>
-        </div>
-        <div class="form-floating">
-            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Пароль">
+            <input type="password" class="form-control" name="password" id="pswd1" placeholder="password">
             <label for="floatingPassword">Пароль</label>
         </div>
 
+        <div class="form-floating">
+            <input type="password" class="form-control" name="password-again" id="pswd2" placeholder="password">
+            <label for="floatingPassword">Подтвердите пароль</label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Далее</button>
         <#if _csrf??>
             <input type="hidden" name="${(_csrf.parameterName)!'csrf'}" value="${(_csrf.token)!'--no-token--'}"/>
         </#if>
-
-        <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Войти</button>
-        <a href="/singup" class="forgot">У вас нет аккаунта?</a>
-        <a href="/forgot" class="forgot">Забыл пароль?</a>
-        <p class="mt-5 mb-3 year">&copy;2021</p>
     </form>
 </main>
+<script src="js/CheckPasswords.js"></script>
 </body>
 </html>

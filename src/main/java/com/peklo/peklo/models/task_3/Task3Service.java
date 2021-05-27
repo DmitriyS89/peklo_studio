@@ -21,9 +21,9 @@ public interface Task3Service {
 
     Document getJSoupConnection(String url) throws UrlNotConnection;
 
-    Pattern getCompile(String url, String protocol, String domain3, String domain2, String domain1);
-    Pattern getCompile(String protocol, String domain2, String domain1);
-    Pattern getCompile(String protocol, String domain2);
+    Pattern getCompile(String url, String protocol, String domain3, String domain2, String domain1, String domain0);
+    Pattern getCompile(String url, String protocol, String domain2, String domain1, String domain0);
+    Pattern getCompile(String url, String protocol, String domain1, String domain0);
 
     SiteWithDomain makeSiteEntity(String url);
 

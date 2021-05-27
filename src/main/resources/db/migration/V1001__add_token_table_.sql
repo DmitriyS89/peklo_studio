@@ -1,0 +1,2 @@
+create table tokens (id bigint not null auto_increment, time datetime, token integer, user_id bigint, primary key (id)) engine=InnoDB;
+alter table tokens add constraint FK_Token_Users foreign key (user_id) references users (id);

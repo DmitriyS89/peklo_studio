@@ -5,4 +5,5 @@ public interface SiteWithDomain {
     String getDomain_3rd();
     String getDomain_2rd();
     String getDomain_1rd();
+    String getDomain_0rd();
 }
