@@ -2,18 +2,21 @@ package com.peklo.peklo.models.task_5;
 
 import com.peklo.peklo.models.task_5.VkImpls.Account;
 import com.peklo.peklo.models.task_5.VkImpls.Group;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -90,5 +93,49 @@ public class Task5Service {
         }
         in.close();
         return page.toString();
+    }
+
+    private File makeExcel(List<UserInfo> data, String url){
+        Map<Integer, String[]> forExcel = new HashMap<>();
+        forExcel.put(0, new String[]{"URL->", url});
+        int count = 1;
+        for (UserInfo element : data) {
+            String[] value = new String[]{
+                    "Name", element.getUserName(),
+                    "Email", element.getUserMail(),
+                    "Number", element.getUserNumber()};
+            forExcel.put(count, value);
+            count++;
+        }
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet spreadsheet = workbook.createSheet("Data by target attribute");
+        XSSFRow row;
+
+        Set<Integer> keyIds = new HashSet<>(forExcel.keySet());
+
+        int rowId = 0;
+
+        for (int key : keyIds) {
+            row = spreadsheet.createRow(rowId);
+            rowId++;
+
+            Object[] objectArr = forExcel.get(key);
+            int cellId = 0;
+            for (Object obj : objectArr) {
+                Cell cell = row.createCell(cellId);
+                cell.setCellValue((String) obj);
+                cellId++;
+            }
+        }
+        File file = new File("peklo_studio/result.xlsx");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }
