@@ -1,20 +1,16 @@
 package com.peklo.peklo.models.task_5;
 
-import com.peklo.peklo.models.task_5.VkImpls.Account;
-import com.peklo.peklo.models.task_5.VkImpls.Group;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class Task5Service {
@@ -24,11 +20,30 @@ public class Task5Service {
 
     private static final String NULL = "NULL";
 
+    public String findGroup(String groupId){
+        String params = String.format("group_ids=&group_id=%s&fields=", groupId);
+        try {
+            URL url = vkApiUrlBuilder("groups.getById", params, access_token);
+            String vkApiAnswer = getVkApiAnswer(url);
+            if(!Pattern.compile("response").matcher(vkApiAnswer).find()) {
+                return NULL;
+            }
+            return vkApiAnswer;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NULL;
+    }
+
     public String getUserInfo(String id){
         String params = String.format("user_ids=%s&fields=contacts", id);
         try {
             URL url = vkApiUrlBuilder("users.get", params, access_token);
-            return getVkApiAnswer(url);
+            String vkApiAnswer = getVkApiAnswer(url);
+            if(!Pattern.compile("response").matcher(vkApiAnswer).find()) {
+                return NULL;
+            }
+            return vkApiAnswer;
         } catch (IOException e) {
             e.printStackTrace();
         }
