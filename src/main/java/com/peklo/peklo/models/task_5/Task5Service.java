@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -109,5 +111,19 @@ public class Task5Service {
             e.printStackTrace();
         }
         return file;
+    }
+
+    private List<UserInfo> parseJSON (String json) {
+        List<UserInfo> users = new ArrayList<>();
+        JSONObject object = new JSONObject(json);
+        JSONArray response = object.getJSONArray("response");
+        for (int i = 0; i < response.length(); i++) {
+            JSONObject jsonObject = response.getJSONObject(i);
+            String firstName = jsonObject.optString("first_name", "null");
+            String lastName = jsonObject.optString("last_name", "null");
+            String mobileNumber = jsonObject.optString("mobile_phone", "Информация отсутствует");
+            users.add(new UserInfo(String.format("%s %s", firstName, lastName), mobileNumber, "Информация отсутствует"));
+        }
+        return users;
     }
 }
