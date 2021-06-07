@@ -126,4 +126,25 @@ public class Task5Service {
         }
         return users;
     }
+
+    public String getConcatId(String groupId, Integer offset){
+        String params = String.format("group_id=%s&sort=id_asc&offset=%s&count=%s", groupId, offset, 1000);
+        try {
+            URL url = vkApiUrlBuilder("groups.getMembers", params, access_token);
+            String usersId = getVkApiAnswer(url);
+            return parseGroupJSON(usersId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NULL;
+    }
+
+
+    private String parseGroupJSON(String json) {
+        JSONObject object = new JSONObject(json);
+        JSONObject obj = object.optJSONObject("response");
+        JSONArray newItems = obj.getJSONArray("items");
+        return newItems.toString().substring(1, newItems.toString().length() - 1);
+    }
+
 }
