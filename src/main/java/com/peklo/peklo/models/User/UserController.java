@@ -79,7 +79,7 @@ public class UserController {
         }
 
         Token token = tokenService.saveToken(dto, tokenService.makeToken());
-//        userService.sendMessage(dto, token.getToken());
+        userService.sendMessage(dto, token.getToken());
         return "redirect:activation";
     }
 
