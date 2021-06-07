@@ -22,12 +22,25 @@ public class Task5Service {
 
     private static final String NULL = "NULL";
 
-    public String findGroup(String groupId){
+    public void start(String id, String mail, String type) {
+        if ("user".equals(type)) {
+            String userInfo = getUserInfo(id);
+            List<UserInfo> users = parseJSON(userInfo);
+            File file = makeExcel(users);
+//            sendMail(file, mail);
+        } else if("group".equals(type)) {
+            List<UserInfo> group1 = getGroup(id);
+            File file = makeExcel(group1);
+//            sendMail(file, mail);
+        }
+    }
+
+    public String findGroup(String groupId) {
         String params = String.format("group_ids=&group_id=%s&fields=", groupId);
         try {
             URL url = vkApiUrlBuilder("groups.getById", params, access_token);
             String vkApiAnswer = getVkApiAnswer(url);
-            if(!Pattern.compile("response").matcher(vkApiAnswer).find()) {
+            if (!Pattern.compile("response").matcher(vkApiAnswer).find()) {
                 return NULL;
             }
             return vkApiAnswer;
@@ -37,12 +50,12 @@ public class Task5Service {
         return NULL;
     }
 
-    public String getUserInfo(String id){
+    public String getUserInfo(String id) {
         String params = String.format("user_ids=%s&fields=contacts", id);
         try {
             URL url = vkApiUrlBuilder("users.get", params, access_token);
             String vkApiAnswer = getVkApiAnswer(url);
-            if(!Pattern.compile("response").matcher(vkApiAnswer).find()) {
+            if (!Pattern.compile("response").matcher(vkApiAnswer).find()) {
                 return NULL;
             }
             return vkApiAnswer;
@@ -50,6 +63,22 @@ public class Task5Service {
             e.printStackTrace();
         }
         return NULL;
+    }
+
+    public List<UserInfo> getGroup(String groupId) {
+        List<UserInfo> userInfos = new ArrayList<>();
+        Integer count = 0;
+        while (true){
+            if(count > 9999) {
+                break;
+            } else {
+                String ids = getConcatId(groupId, count);
+                String userInfo = getUserInfo(ids);
+                userInfos.addAll(parseJSON(userInfo));
+                count += 1000;
+            }
+        }
+        return userInfos;
     }
 
     private URL vkApiUrlBuilder(String method, String params, String access_token) throws IOException {
@@ -69,15 +98,15 @@ public class Task5Service {
         return page.toString();
     }
 
-    private File makeExcel(List<UserInfo> data, String url){
+    private File makeExcel(List<UserInfo> data) {
         Map<Integer, String[]> forExcel = new HashMap<>();
-        forExcel.put(0, new String[]{"URL->", url});
+//        forExcel.put(0, new String[]{"URL->", url});
         int count = 1;
         for (UserInfo element : data) {
             String[] value = new String[]{
-                    "Name", element.getUserName(),
-                    "Email", element.getUserMail(),
-                    "Number", element.getUserNumber()};
+                    "Имя", element.getUserName(),
+                    "Адрес", element.getUserMail(),
+                    "номер", element.getUserNumber()};
             forExcel.put(count, value);
             count++;
         }
@@ -102,7 +131,7 @@ public class Task5Service {
                 cellId++;
             }
         }
-        File file = new File("peklo_studio/result.xlsx");
+        File file = new File("result.xlsx");
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
             workbook.write(outputStream);
@@ -147,4 +176,38 @@ public class Task5Service {
         return newItems.toString().substring(1, newItems.toString().length() - 1);
     }
 
+    public String cutUrlUser(String url) {
+        String result = "";
+        if (!Pattern.compile("m\\.vk\\.com").matcher(url).find()) {
+            if (Pattern.compile("id").matcher(url).find()) {
+                result = url.substring(17);
+            } else {
+                result = url.substring(15);
+            }
+        } else {
+            if (Pattern.compile("id").matcher(url).find()) {
+                result = url.substring(19);
+            } else {
+                result = url.substring(17);
+            }
+        }
+        return result;
+    }
+    public String cutUrlGroup(String url) {
+        String result = "";
+        if (!Pattern.compile("m\\.vk\\.com").matcher(url).find()) {
+            if (Pattern.compile("public").matcher(url).find()) {
+                result = url.substring(21);
+            } else {
+                result = url.substring(15);
+            }
+        } else {
+            if (Pattern.compile("public").matcher(url).find()) {
+                result = url.substring(23);
+            } else {
+                result = url.substring(17);
+            }
+        }
+        return result;
+    }
 }
