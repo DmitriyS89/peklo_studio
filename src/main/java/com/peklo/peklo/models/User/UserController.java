@@ -95,7 +95,7 @@ public class UserController {
     public String identifyPost(@RequestParam String userEmail) {
         User user = userService.findByEmail(userEmail);
         Token token = tokenService.saveToken(user, tokenService.makeToken());
-        //userService.sendMessage(dto, token.getToken());
+        userService.sendMessage(user, token.getToken());
         return "redirect:identify?userEmail=" + user.getEmail();
     }
 
@@ -137,13 +137,18 @@ public class UserController {
     }
 
     @GetMapping("/resetPassword")
-    public String resetPassword(@RequestParam String userEmail, @RequestParam Integer token,  Model model){
-        if (tokenService.findToken(token)) {
-            Token userToken = tokenService.getToken(token);
-            tokenService.deleteToken(userToken);
-            model.addAttribute("userEmail", userEmail);
-            return "newPassword";
-        } else
-            throw new TokenNotAccepted(userEmail);
+    public String resetPassword(@RequestParam String userEmail, @RequestParam String token,  Model model){
+        try {
+            int tokenInteger = Integer.parseInt(token);
+            if (tokenService.findToken(tokenInteger)) {
+                Token userToken = tokenService.getToken(tokenInteger);
+                tokenService.deleteToken(userToken);
+                model.addAttribute("userEmail", userEmail);
+                return "newPassword";
+            }
+        }catch (NumberFormatException ex){
+            System.out.println();
+        }
+        throw new TokenNotAccepted(userEmail);
     }
 }
