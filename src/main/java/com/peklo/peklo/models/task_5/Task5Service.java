@@ -1,0 +1,213 @@
+package com.peklo.peklo.models.task_5;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
+import java.util.regex.Pattern;
+
+@Service
+public class Task5Service {
+
+    @Value("${vkApiToken}")
+    private String access_token;
+
+    private static final String NULL = "NULL";
+
+    public void start(String id, String mail, String type) {
+        if ("user".equals(type)) {
+            String userInfo = getUserInfo(id);
+            List<UserInfo> users = parseJSON(userInfo);
+            File file = makeExcel(users);
+//            sendMail(file, mail);
+        } else if("group".equals(type)) {
+            List<UserInfo> group1 = getGroup(id);
+            File file = makeExcel(group1);
+//            sendMail(file, mail);
+        }
+    }
+
+    public String findGroup(String groupId) {
+        String params = String.format("group_ids=&group_id=%s&fields=", groupId);
+        try {
+            URL url = vkApiUrlBuilder("groups.getById", params, access_token);
+            String vkApiAnswer = getVkApiAnswer(url);
+            if (!Pattern.compile("response").matcher(vkApiAnswer).find()) {
+                return NULL;
+            }
+            return vkApiAnswer;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NULL;
+    }
+
+    public String getUserInfo(String id) {
+        String params = String.format("user_ids=%s&fields=contacts", id);
+        try {
+            URL url = vkApiUrlBuilder("users.get", params, access_token);
+            String vkApiAnswer = getVkApiAnswer(url);
+            if (!Pattern.compile("response").matcher(vkApiAnswer).find()) {
+                return NULL;
+            }
+            return vkApiAnswer;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NULL;
+    }
+
+    public List<UserInfo> getGroup(String groupId) {
+        List<UserInfo> userInfos = new ArrayList<>();
+        Integer count = 0;
+        while (true){
+            if(count > 9999) {
+                break;
+            } else {
+                String ids = getConcatId(groupId, count);
+                String userInfo = getUserInfo(ids);
+                userInfos.addAll(parseJSON(userInfo));
+                count += 1000;
+            }
+        }
+        return userInfos;
+    }
+
+    private URL vkApiUrlBuilder(String method, String params, String access_token) throws IOException {
+        String url = String.format("https://api.vk.com/method/%s?%s&access_token=%s&v=%s",
+                method, params, access_token, "5.131");
+        return new URL(url);
+    }
+
+    private String getVkApiAnswer(URL url) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+        StringBuilder page = new StringBuilder();
+        String line;
+        while ((line = in.readLine()) != null) {
+            page.append(line);
+        }
+        in.close();
+        return page.toString();
+    }
+
+    private File makeExcel(List<UserInfo> data) {
+        Map<Integer, String[]> forExcel = new HashMap<>();
+//        forExcel.put(0, new String[]{"URL->", url});
+        int count = 1;
+        for (UserInfo element : data) {
+            String[] value = new String[]{
+                    "Имя", element.getUserName(),
+                    "Адрес", element.getUserMail(),
+                    "номер", element.getUserNumber()};
+            forExcel.put(count, value);
+            count++;
+        }
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet spreadsheet = workbook.createSheet("Data by target attribute");
+        XSSFRow row;
+
+        Set<Integer> keyIds = new HashSet<>(forExcel.keySet());
+
+        int rowId = 0;
+
+        for (int key : keyIds) {
+            row = spreadsheet.createRow(rowId);
+            rowId++;
+
+            Object[] objectArr = forExcel.get(key);
+            int cellId = 0;
+            for (Object obj : objectArr) {
+                Cell cell = row.createCell(cellId);
+                cell.setCellValue((String) obj);
+                cellId++;
+            }
+        }
+        File file = new File("result.xlsx");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
+
+    private List<UserInfo> parseJSON (String json) {
+        List<UserInfo> users = new ArrayList<>();
+        JSONObject object = new JSONObject(json);
+        JSONArray response = object.getJSONArray("response");
+        for (int i = 0; i < response.length(); i++) {
+            JSONObject jsonObject = response.getJSONObject(i);
+            String firstName = jsonObject.optString("first_name", "null");
+            String lastName = jsonObject.optString("last_name", "null");
+            String mobileNumber = jsonObject.optString("mobile_phone", "Информация отсутствует");
+            users.add(new UserInfo(String.format("%s %s", firstName, lastName), mobileNumber, "Информация отсутствует"));
+        }
+        return users;
+    }
+
+    public String getConcatId(String groupId, Integer offset){
+        String params = String.format("group_id=%s&sort=id_asc&offset=%s&count=%s", groupId, offset, 1000);
+        try {
+            URL url = vkApiUrlBuilder("groups.getMembers", params, access_token);
+            String usersId = getVkApiAnswer(url);
+            return parseGroupJSON(usersId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NULL;
+    }
+
+
+    private String parseGroupJSON(String json) {
+        JSONObject object = new JSONObject(json);
+        JSONObject obj = object.optJSONObject("response");
+        JSONArray newItems = obj.getJSONArray("items");
+        return newItems.toString().substring(1, newItems.toString().length() - 1);
+    }
+
+    public String cutUrlUser(String url) {
+        String result = "";
+        if (!Pattern.compile("m\\.vk\\.com").matcher(url).find()) {
+            if (Pattern.compile("id").matcher(url).find()) {
+                result = url.substring(17);
+            } else {
+                result = url.substring(15);
+            }
+        } else {
+            if (Pattern.compile("id").matcher(url).find()) {
+                result = url.substring(19);
+            } else {
+                result = url.substring(17);
+            }
+        }
+        return result;
+    }
+    public String cutUrlGroup(String url) {
+        String result = "";
+        if (!Pattern.compile("m\\.vk\\.com").matcher(url).find()) {
+            if (Pattern.compile("public").matcher(url).find()) {
+                result = url.substring(21);
+            } else {
+                result = url.substring(15);
+            }
+        } else {
+            if (Pattern.compile("public").matcher(url).find()) {
+                result = url.substring(23);
+            } else {
+                result = url.substring(17);
+            }
+        }
+        return result;
+    }
+}
