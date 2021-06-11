@@ -17,16 +17,16 @@ public class Task1Service {
 
     private final Task3Service task3Service;
 
-//    public Html drawSite(String url, Boolean isScript){
-//        try {
-//            Document doc = task3Service.getJSoupConnection(url);
-//            String links = getElements(doc, isScript);
-//            return new Html(links, doc.body().html());
-//        } catch (UrlNotConnection e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
+    public Html drawSite(String url, Boolean isScript){
+        try {
+            Document doc = task3Service.getJSoupConnection(url);
+            String links = getElements(doc, isScript);
+            return new Html(links, doc.body().html());
+        } catch (UrlNotConnection e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private String getElements(Document doc, Boolean isScript){
         String links = getLinks(doc);
