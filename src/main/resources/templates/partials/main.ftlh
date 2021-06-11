@@ -41,7 +41,7 @@
                 <a href="/tool_4/result" class="list-group-item list-group-item-action bg-light">Инструмент,
                     определяющий дубликаты
                     страниц без 301 редиректов</a>
-                <a href="/tool_5" class="list-group-item list-group-item-action bg-light">Парсер подписчиков со страниц
+                <a href="/tool_5/result" class="list-group-item list-group-item-action bg-light">Парсер подписчиков со страниц
                     соцсетей
                     Facebook, Instagram и ВКонтакте</a>
             </div>
