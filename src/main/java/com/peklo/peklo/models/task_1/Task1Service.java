@@ -21,6 +21,7 @@ public class Task1Service {
         try {
             Document doc = task3Service.getJSoupConnection(url);
             String links = getElements(doc, isScript);
+            setImgUrls(doc);
             return new Html(links, doc.body().html());
         } catch (UrlNotConnection e) {
             e.printStackTrace();
@@ -66,14 +67,21 @@ public class Task1Service {
         return stringBuilder.toString();
     }
 
-//    public List<String> getElements(String elements) {
-//        JSONArray objects = new JSONArray(elements.substring(9));
-//
-//        List<String> elems = new ArrayList<>();
-//        for (int i = 0; i < objects.length(); i++) {
-//            String optString = objects.optString(i, "");
-//            if(!optString.isEmpty()) elems.add(optString);
-//        }
-//        return elems;
-//    }
+    public List<String> getElements(String elements) {
+        JSONArray objects = new JSONArray(elements.substring(9));
+
+        List<String> elems = new ArrayList<>();
+        for (int i = 0; i < objects.length(); i++) {
+            String optString = objects.optString(i, "");
+            if(!optString.isEmpty()) elems.add(optString);
+        }
+        return elems;
+    }
+
+    private void setImgUrls(Document document){
+        for (Element element : document.getElementsByTag("img")) {
+            String attr = element.attr("abs:src");
+            element.attributes().put("src", attr);
+        }
+    }
 }

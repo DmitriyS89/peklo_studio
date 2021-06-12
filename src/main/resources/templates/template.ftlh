@@ -33,6 +33,9 @@
 </div>
 <form action="/tool_1/saveElements" method="post" id="tool_1_submit" hidden>
     <input type="hidden" name="elements" id="tool_1_elem-array-json">
+    <#if _csrf??>
+        <input type="hidden" name="${(_csrf.parameterName)!'csrf'}" value="${(_csrf.token)!'--no-token--'}"/>
+    </#if>
 </form>
 <script src="/js/Tool_1_Handler.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
