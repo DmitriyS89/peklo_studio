@@ -62,4 +62,20 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
+
+
+    public Boolean changeUserChatId(Long userId, String chatId){
+        Optional<User> user = userRepository.findById(userId);
+        if(user.isPresent()){
+            user.get().setChatId(chatId);
+            userRepository.save(user.get());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public User getUser(Long aLong) {
+        return userRepository.getOne(aLong);
+    }
 }
