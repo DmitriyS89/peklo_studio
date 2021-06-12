@@ -4,7 +4,6 @@ import com.peklo.peklo.models.User.User;
 import com.peklo.peklo.models.User.UserService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,8 +25,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class Bot extends TelegramLongPollingBot {
 
-//    private final TelegramTokenService telegramTokenService;
-//    private final UserService userService;
+    private final TelegramTokenService telegramTokenService;
+    private final UserService userService;
 
     @Value("${telegramBot.token}")
     private String BotToken;
@@ -50,29 +49,28 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
-        sendMessage(message.getChatId().toString(), message.getText());
-//        if (!message.isCommand() || !message.getText().startsWith(botCommand.getCommand())) {
-//            return;
-//        }
-//
-//        String chatId = message.getChatId().toString();
-//
-//        try {
-//            String userToken = message.getText().substring(9);
-//            Optional<Long> userId = telegramTokenService.closeToken(userToken);
-//            if (userId.isPresent()) {
-//                if (!userService.changeUserChatId(userId.get(), chatId)) {
-//                    sendMessage(chatId, "Ой ой ошибка! Попробуйте заново");
-//                } else {
-//                    User user = userService.getUser(userId.get());
-//                    sendMessage(chatId, String.format("Успешно! %s", user.getEmail()));
-//                }
-//            } else {
-//                sendMessage(chatId, "Токен не найден!");
-//            }
-//        }catch (StringIndexOutOfBoundsException ex){
-//            sendMessage(chatId, "Пример:\n\n\"/save_me токен\"\n\n");
-//        }
+        if (!message.isCommand() || !message.getText().startsWith(botCommand.getCommand())) {
+            return;
+        }
+
+        String chatId = message.getChatId().toString();
+
+        try {
+            String userToken = message.getText().substring(9);
+            Optional<Long> userId = telegramTokenService.closeToken(userToken);
+            if (userId.isPresent()) {
+                if (!userService.changeUserChatId(userId.get(), chatId)) {
+                    sendMessage(chatId, "Ой ой ошибка! Попробуйте заново");
+                } else {
+                    User user = userService.getUser(userId.get());
+                    sendMessage(chatId, String.format("Успешно! %s", user.getEmail()));
+                }
+            } else {
+                sendMessage(chatId, "Токен не найден!");
+            }
+        }catch (StringIndexOutOfBoundsException ex){
+            sendMessage(chatId, "Пример:\n\n\"/save_me токен\"\n\n");
+        }
     }
 
     public Boolean sendMessage(String chatId, String message) {
