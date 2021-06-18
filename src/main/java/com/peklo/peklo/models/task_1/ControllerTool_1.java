@@ -1,12 +1,17 @@
 package com.peklo.peklo.models.task_1;
 
+import com.peklo.peklo.models.User.User;
+import com.peklo.peklo.models.User.UserService;
+import com.peklo.peklo.models.task_3.Task3Service;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -15,9 +20,12 @@ import java.util.List;
 public class ControllerTool_1 {
 
     private final Task1Service task1Service;
+    private final Task3Service task3Service;
+    private final UserService userService;
 
     private Boolean scripts = true;
     private String clientUrl = "";
+    private Document document = null;
 
     @ResponseBody
     @GetMapping("getSiteElements")
@@ -26,7 +34,11 @@ public class ControllerTool_1 {
     }
 
     @GetMapping()
-    public String getTemplate(){
+    public String getTemplate(Principal principal){
+        User user = userService.findByEmail(principal.getName());
+        if(user.getChatId() == null || user.getChatId().isBlank()){
+            return "redirect:/telegram-bot/accept-telegram-account";
+        }
         return "redirect:tool_1/result";
     }
 
