@@ -20,27 +20,39 @@ button, a, input {
     color: black !important;
     border-radius: 40px !important;
     width: 30% !important;
-    height: 40% !important;
     margin: 30px auto auto !important;
     background: white !important;
 }
 
 .modal_header {
     font-size: 16px !important;
-    height: 25% !important;
     padding: 10px!important;
     border-bottom: 2px solid rgba(0, 0, 0, 0.3) !important;
 }
 
 .modal_body {
-    height: 40% !important;
     padding: 5px 25px 0 25px !important;
     border-bottom: 2px solid rgba(0, 0, 0, 0.3) !important;
 }
 
+.modal_body .times{
+    display: flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.times .time{
+    width: 30%;
+    margin: auto;
+    height: 21px;
+}
+
+.times .time input{
+    width: 100%;
+}
+
 .modal_footer {
     width: 100% !important;
-    height: 20% !important;
     display:flex !important;
 }
 
