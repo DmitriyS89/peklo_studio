@@ -1,5 +1,6 @@
 package com.peklo.peklo.models.task_1;
 
+import com.peklo.peklo.exceptions.UrlNotConnection;
 import com.peklo.peklo.models.User.User;
 import com.peklo.peklo.models.User.UserService;
 import com.peklo.peklo.models.task_3.Task3Service;
@@ -13,6 +14,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("tool_1")
@@ -29,8 +31,10 @@ public class ControllerTool_1 {
 
     @ResponseBody
     @GetMapping("getSiteElements")
-    public Html getHtml(){
-        return task1Service.drawSite(clientUrl, scripts);
+    public Html getHtml() throws UrlNotConnection {
+        Document document = task3Service.getJSoupConnection(clientUrl);
+        this.document = document;
+        return task1Service.drawSite(document, scripts);
     }
 
     @GetMapping()
@@ -57,10 +61,27 @@ public class ControllerTool_1 {
     }
 
     @PostMapping("saveElements")
-    public String getElements(@RequestBody String elements) {
+    public String getElements(Principal principal, @RequestBody String elements, @RequestParam String time) {
+        User user = userService.findByEmail(principal.getName());
         String decode = URLDecoder.decode(elements, StandardCharsets.UTF_8);
         List<String> elements1 = task1Service.getElements(decode);
-
+//        task1Service.saveElements(document, elements1, time, user.getChatId());
         return "redirect:result?success=true";
+    }
+
+    @GetMapping("client-items")
+    public String getClientItems(Principal principal, Model model){
+//        User user = userService.findByEmail(principal.getName());
+//        List<Tool1ItemDto> items = task1Service.getItemsWithUserChatId(user.getChatId()).stream()
+//                .map(Tool1ItemDto::from)
+//                .collect(Collectors.toList());
+//        model.addAttribute("clientItems", items);
+        return "tool_1_items";
+    }
+
+    @PostMapping("delete-item")
+    public String deleteElement(@RequestParam Long id){
+//        task1Service.deleteItem(id);
+        return "redirect:/tool_1/client-items";
     }
 }
