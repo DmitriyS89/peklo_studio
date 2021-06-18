@@ -2,6 +2,7 @@ package com.peklo.peklo.models.task_1;
 
 import com.peklo.peklo.exceptions.UrlNotConnection;
 import com.peklo.peklo.models.task_3.Task3Service;
+import com.peklo.peklo.models.telegram_bot.Bot;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.jsoup.nodes.Document;
@@ -15,18 +16,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Task1Service {
 
-    private final Task3Service task3Service;
+    private final Tool1ItemRepository tool1ItemRepository;
+    private final Bot telegram_bot;
 
-    public Html drawSite(String url, Boolean isScript){
-        try {
-            Document doc = task3Service.getJSoupConnection(url);
-            String links = getElements(doc, isScript);
-            setImgUrls(doc);
-            return new Html(links, doc.body().html());
-        } catch (UrlNotConnection e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Html drawSite(Document doc, Boolean isScript) {
+        String links = getElements(doc, isScript);
+        setImgUrls(doc);
+        return new Html(links, doc.body().html());
     }
 
     private String getElements(Document doc, Boolean isScript){
