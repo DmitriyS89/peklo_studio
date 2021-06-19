@@ -21,9 +21,23 @@
         <div class="modal_body" highlightedTool1="true">
             <p highlightedTool1="true">Сайт: ${client_url} </p>
             <p highlightedTool1="true">Было выделено <strong id="tool_1_count">0</strong> элементов</p>
+            <div highlightedTool1="true" >Время проверки:
+                <div highlightedTool1="true" class="times">
+                    Каждые
+                    <label highlightedTool1="true" class="time">
+                        <input highlightedTool1="true" type="number" id="timeNumber" min="1" max="24" value="1">
+                    </label>
+                    <label highlightedTool1="true" class="time">
+                        <select id="time_type" highlightedTool1="true">
+                            <option value="d_" highlightedTool1="true">дня\дней</option>
+                            <option value="h_" selected highlightedTool1="true">часа\часов</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
         </div>
         <div class="modal_footer" highlightedTool1="true">
-            <button onclick="saveDatasets()" highlightedTool1="true">Сохранить</button>
+            <button onclick="saveDatasets()" highlightedTool1="true" disabled id="submitButtonTool1">Сохранить</button>
             <button onclick="closeModal()" highlightedTool1="true">Отмена</button>
         </div>
     </div>
@@ -33,6 +47,7 @@
 </div>
 <form action="/tool_1/saveElements" method="post" id="tool_1_submit" hidden>
     <input type="hidden" name="elements" id="tool_1_elem-array-json">
+    <input type="hidden" name="time" id="tool_1_time">
     <#if _csrf??>
         <input type="hidden" name="${(_csrf.parameterName)!'csrf'}" value="${(_csrf.token)!'--no-token--'}"/>
     </#if>

@@ -9,6 +9,7 @@ let url = "http://localhost:8080";
 let modalWindow = document.getElementById("tool_1_modal_window");
 
 function openModal() {
+    openButton();
     modalWindow.hidden = false;
     document.getElementById("tool_1_count").innerHTML = `${count}`;
 }
@@ -17,8 +18,17 @@ function refreshAll() {
     window.location.reload(false);
 }
 
+function preparationTime() {
+    let timeNumber = document.getElementById("timeNumber").value;
+    let timeType = document.getElementById("time_type").value;
+
+    return timeType + timeNumber;
+}
+
 function saveDatasets() {
     let value = JSON.stringify(elements).toString();
+    let time = preparationTime();
+    document.getElementById("tool_1_time").setAttribute("value", time)
     document.getElementById("tool_1_elem-array-json").setAttribute("value", value);
     document.getElementById("tool_1_submit").submit();
 }
@@ -31,11 +41,19 @@ function closeModal() {
     modalWindow.hidden = true;
 }
 
+function openButton() {
+    if(elements.length > 0) {
+        let elementById = document.getElementById("submitButtonTool1");
+        elementById.removeAttribute("disabled")
+    }
+}
+
 function getTarget(e) {
     let target = e.target;
     let state = target.getAttribute("highlightedTool1")
     if (state !== "true") {
-        elements.push(target.outerHTML);
+        let cssPath = dompath(target).toCSS();
+        elements.push(cssPath);
         target.classList.add("red-line-tool1");
         target.setAttribute("highlightedTool1", "true");
         count++;
@@ -77,12 +95,12 @@ promise();
         return new DomPath(el.node);
     };
 
-    var getSelector = function(node) {
+    let getSelector = function(node) {
         if(node.id !== '') {
             return '#' + node.id;
         }
 
-        var root = '';
+        let root = '';
         if(node.parent) {
             root = getSelector(node.parent) + ' > ';
         }
@@ -90,7 +108,7 @@ promise();
         return root + node.name + ':nth-child(' + (node.index + 1) + ')';
     };
 
-    var DomPath = function(node) { this.node = node; };
+    let DomPath = function(node) { this.node = node; };
     DomPath.prototype = {
         toCSS: function() {
             return getSelector(this.node);
@@ -105,8 +123,8 @@ promise();
         }
     };
 
-    var pathNode = function(el, root) {
-        var node = {
+    let pathNode = function(el, root) {
+        let node = {
             id: el.id,
             name: el.nodeName.toLowerCase(),
             index: childIndex(el),
@@ -120,8 +138,8 @@ promise();
         return node;
     };
 
-    var childIndex = function(el) {
-        var idx = 0;
+    let childIndex = function(el) {
+        let idx = 0;
         while(el = el.previousSibling) {
             if(el.nodeType == 1) {
                 idx++;
