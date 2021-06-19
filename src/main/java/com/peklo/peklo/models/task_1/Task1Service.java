@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +79,24 @@ public class Task1Service {
         for (Element element : document.getElementsByTag("img")) {
             String attr = element.attr("abs:src");
             element.attributes().put("src", attr);
+        }
+    }
+
+    public void saveElements(Document document, List<String> elements, String time, String chatId) {
+        for (String element : elements) {
+            String newElement = element;
+            if (element.startsWith("#mini-body-for-site")) {
+                newElement = element.substring(22);
+            }
+            Tool1Item tool1Item = Tool1Item.builder()
+                    .fromUrl(document.location())
+                    .htmlValue(document.select(newElement).toString())
+                    .cssPath(newElement)
+                    .time(time)
+                    .userChatId(chatId)
+                    .localDateTime(LocalDateTime.now())
+                    .build();
+            tool1ItemRepository.save(tool1Item);
         }
     }
 }

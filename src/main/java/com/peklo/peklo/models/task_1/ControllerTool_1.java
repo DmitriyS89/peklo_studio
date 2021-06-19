@@ -65,7 +65,7 @@ public class ControllerTool_1 {
         User user = userService.findByEmail(principal.getName());
         String decode = URLDecoder.decode(elements, StandardCharsets.UTF_8);
         List<String> elements1 = task1Service.getElements(decode);
-//        task1Service.saveElements(document, elements1, time, user.getChatId());
+        task1Service.saveElements(document, elements1, time, user.getChatId());
         return "redirect:result?success=true";
     }
 
