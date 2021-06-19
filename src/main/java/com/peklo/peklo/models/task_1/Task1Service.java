@@ -104,4 +104,8 @@ public class Task1Service {
         tool1ItemRepository.saveAll(items);
     }
 
+    public List<Tool1Item> getAllElements() {
+        return tool1ItemRepository.findAll();
+    }
+
 }
