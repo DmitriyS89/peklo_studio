@@ -99,4 +99,16 @@ public class Task1Service {
             tool1ItemRepository.save(tool1Item);
         }
     }
+
+    public void saveAll(List<Tool1Item> items) {
+        tool1ItemRepository.saveAll(items);
+    }
+
+    public List<Tool1Item> getAllElements() {
+        return tool1ItemRepository.findAll();
+    }
+
+    public void sendMessage(String text, String userChatId) {
+        telegram_bot.sendMessage(userChatId, text);
+    }
 }
