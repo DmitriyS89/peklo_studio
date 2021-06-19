@@ -49,55 +49,55 @@ public class Task1BotWork {
                     results.add(item);
                 }
             }
-//            changeAndSave(results);
+            changeAndSave(results);
         }
     }
 
-//    @Async
-//    public void changeAndSave(List<Tool1Item> items) {
-//        if (items.size() > 0) {
-//            items.forEach(item -> item.setLocalDateTime(LocalDateTime.now()));
-//            task1Service.saveAll(items);
-//            Set<String> strings = items.stream().map(Tool1Item::getFromUrl).collect(Collectors.toSet());
-//            List<Document> documents = new ArrayList<>();
-//            for (String url : strings) {
-//                try {
-//                    documents.add(task3Service.getJSoupConnection(url));
-//                } catch (UrlNotConnection urlNotConnection) {
-//                    urlNotConnection.printStackTrace();
-//                    documents.add(null);
-//                }
-//            }
-//            List<LinkedList<DiffMatchPatch.Diff>> diffs = task1Service.foundDiffs(items, documents);
-//
-//
-//            for (int i = 0; i < diffs.size(); i++){
-//                StringBuilder stringBuilder = new StringBuilder();
-//
-//                String stringFromDiff = task1Service.getStringFromDiff(diffs.get(i));
-//                stringBuilder.append("Старое: ").append(items.get(i).getHtmlValue()).append("\n\n");
-//                stringBuilder.append("Новое : ").append(stringFromDiff).append("\n\n");
-//
-//                stringBuilder.append("\n\n");
-//                for (DiffMatchPatch.Diff d : diffs.get(i)) {
-//                    switch (d.operation){
-////                        case EQUAL:
-////                            stringBuilder.append("Без изменений: ").append(d.text).append("\n");
-////                            break;
-//                        case DELETE:
-//                            stringBuilder.append("Удалено: ").append(d.text).append("\n");
+    @Async
+    public void changeAndSave(List<Tool1Item> items) {
+        if (items.size() > 0) {
+            items.forEach(item -> item.setLocalDateTime(LocalDateTime.now()));
+            task1Service.saveAll(items);
+            Set<String> strings = items.stream().map(Tool1Item::getFromUrl).collect(Collectors.toSet());
+            List<Document> documents = new ArrayList<>();
+            for (String url : strings) {
+                try {
+                    documents.add(task3Service.getJSoupConnection(url));
+                } catch (UrlNotConnection urlNotConnection) {
+                    urlNotConnection.printStackTrace();
+                    documents.add(null);
+                }
+            }
+            List<LinkedList<DiffMatchPatch.Diff>> diffs = task1Service.foundDiffs(items, documents);
+
+
+            for (int i = 0; i < diffs.size(); i++){
+                StringBuilder stringBuilder = new StringBuilder();
+
+                String stringFromDiff = task1Service.getStringFromDiff(diffs.get(i));
+                stringBuilder.append("Старое: ").append(items.get(i).getHtmlValue()).append("\n\n");
+                stringBuilder.append("Новое : ").append(stringFromDiff).append("\n\n");
+
+                stringBuilder.append("\n\n");
+                for (DiffMatchPatch.Diff d : diffs.get(i)) {
+                    switch (d.operation){
+//                        case EQUAL:
+//                            stringBuilder.append("Без изменений: ").append(d.text).append("\n");
 //                            break;
-//                        case INSERT:
-//                            stringBuilder.append("Добавлено: ").append(d.text).append("\n");
-//                            break;
-//                    }
-//
-//                }
-//
-//                long count = diffs.get(i).stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
-//                if(count == 1) stringBuilder.append("Не каких изменений!");
-//                task1Service.sendMessage(stringBuilder.toString(), items.get(i).getUserChatId());
-//            }
-//        }
-//    }
+                        case DELETE:
+                            stringBuilder.append("Удалено: ").append(d.text).append("\n");
+                            break;
+                        case INSERT:
+                            stringBuilder.append("Добавлено: ").append(d.text).append("\n");
+                            break;
+                    }
+
+                }
+
+                long count = diffs.get(i).stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
+                if(count == 1) stringBuilder.append("Не каких изменений!");
+                task1Service.sendMessage(stringBuilder.toString(), items.get(i).getUserChatId());
+            }
+        }
+    }
 }

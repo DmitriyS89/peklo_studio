@@ -4,6 +4,7 @@ import com.peklo.peklo.exceptions.UrlNotConnection;
 import com.peklo.peklo.models.task_3.Task3Service;
 import com.peklo.peklo.models.telegram_bot.Bot;
 import lombok.RequiredArgsConstructor;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.json.JSONArray;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -110,5 +113,29 @@ public class Task1Service {
 
     public void sendMessage(String text, String userChatId) {
         telegram_bot.sendMessage(userChatId, text);
+    }
+
+    public String getStringFromDiff(LinkedList<DiffMatchPatch.Diff> diffs){
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> stringList = diffs.stream().filter(e -> e.operation == DiffMatchPatch.Operation.EQUAL || e.operation == DiffMatchPatch.Operation.INSERT).map(e -> e.text).collect(Collectors.toList());
+        for (String str : stringList) {
+            stringBuilder.append(str);
+        }
+        return stringBuilder.toString();
+    }
+
+    public List<LinkedList<DiffMatchPatch.Diff>> foundDiffs(List<Tool1Item> items, List<Document> documents) {
+        DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
+        List<LinkedList<DiffMatchPatch.Diff>> diffs = new ArrayList<>();
+        for (Document doc : documents) {
+            for (Tool1Item item : items) {
+                if (doc.location().equals(item.getFromUrl())) {
+                    String nowHtmlValue = doc.select(item.getCssPath()).toString();
+                    String oldHtmlValue = item.getHtmlValue();
+                    diffs.add(diffMatchPatch.diffMain(oldHtmlValue, nowHtmlValue, false));
+                }
+            }
+        }
+        return diffs;
     }
 }
