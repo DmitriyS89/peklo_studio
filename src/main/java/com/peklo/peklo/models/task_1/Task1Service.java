@@ -99,4 +99,9 @@ public class Task1Service {
             tool1ItemRepository.save(tool1Item);
         }
     }
+
+    public void saveAll(List<Tool1Item> items) {
+        tool1ItemRepository.saveAll(items);
+    }
+
 }
