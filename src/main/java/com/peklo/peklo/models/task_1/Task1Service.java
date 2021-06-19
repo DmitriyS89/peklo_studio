@@ -108,4 +108,7 @@ public class Task1Service {
         return tool1ItemRepository.findAll();
     }
 
+    public void sendMessage(String text, String userChatId) {
+        telegram_bot.sendMessage(userChatId, text);
+    }
 }
