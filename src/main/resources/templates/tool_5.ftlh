@@ -18,8 +18,8 @@
             <div class="form-group">
                 <select class="form-control" name="social" id="exampleFormControlSelect1">
                     <option>vk</option>
-                    <option>facebook</option>
-                    <option>instagram</option>
+                    <option disabled>facebook</option>
+                    <option disabled>instagram</option>
                 </select>
             </div>
             <div class="form-group">

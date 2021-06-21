@@ -11,7 +11,7 @@
             <table class="table myTable">
                 <thead class="thead-light">
                 <tr>
-                    <th scope="col" class="width50">Сайт</th>
+                    <th scope="col" class="width30">Сайт</th>
                     <th scope="col" class="width20">Время проверки</th>
                     <th scope="col" class="width15">Статус</th>
                     <th scope="col" class="width15">Настройка</th>
@@ -20,7 +20,7 @@
                 <tbody>
                 <#list clientItems as item>
                     <tr>
-                        <td class="width50"><a href="${item.url}"><p>${item.url}</p></a></td>
+                        <td class="width30"><a href="${item.url}"><p class="myP">${item.url}</p></a></td>
                         <td class="width20">каждые ${item.time}</td>
                         <td class="width15" style="color: ${item.htmlValueState}">${item.htmlValueState}</td>
                         <td class="width15">
