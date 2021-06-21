@@ -4,9 +4,9 @@
  * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-simple-sidebar/blob/master/LICENSE)
  */
 
- #wrapper {
-    overflow-x: hidden;
- }
+#wrapper {
+  overflow-x: hidden;
+}
 
 #sidebar-wrapper {
   min-height: 100vh;
@@ -73,4 +73,27 @@
   #wrapper.toggled #sidebar-wrapper {
     margin-left: -15rem;
   }
+}
+
+.myTable tr{
+  display: flex;
+}
+
+.myTable .width30{
+  width: 30%;
+}
+.myTable .width50{
+  width: 50%;
+}
+.myTable .width15{
+  width: 15%;
+}
+.myTable .width20, .myP{
+  width: 20%;
+}
+
+.myTable tbody tr td p, .myP{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow:ellipsis;
 }

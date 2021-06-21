@@ -26,12 +26,12 @@
         </div>
 
         <form class="mx-auto w-50 d-flex flex-row" action="/tool_4/run" method="post">
-            <div class="form-group">
-                <select class="form-control" name="protocol" id="exampleFormControlSelect1">
-                    <option>http://</option>
-                    <option>https://</option>
-                </select>
-            </div>
+            <#--            <div class="form-group">-->
+            <#--                <select class="form-control" name="protocol" id="exampleFormControlSelect1">-->
+            <#--                    <option>http://</option>-->
+            <#--                    <option>https://</option>-->
+            <#--                </select>-->
+            <#--            </div>-->
             <div class="form-group">
                 <input required type="text" class="form-control" name="urlFromFront" id="exampleFormControlInput1"
                        placeholder="domain">
