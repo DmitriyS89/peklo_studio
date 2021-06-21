@@ -23,7 +23,7 @@ public class Tool1Item {
     private Long id;
 
     private String fromUrl;
-
+    @Lob
     private String htmlValue;
 
     private String cssPath;
