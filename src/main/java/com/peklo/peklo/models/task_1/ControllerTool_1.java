@@ -71,17 +71,17 @@ public class ControllerTool_1 {
 
     @GetMapping("client-items")
     public String getClientItems(Principal principal, Model model){
-//        User user = userService.findByEmail(principal.getName());
-//        List<Tool1ItemDto> items = task1Service.getItemsWithUserChatId(user.getChatId()).stream()
-//                .map(Tool1ItemDto::from)
-//                .collect(Collectors.toList());
-//        model.addAttribute("clientItems", items);
+        User user = userService.findByEmail(principal.getName());
+        List<Tool1ItemDto> items = task1Service.getItemsWithUserChatId(user.getChatId()).stream()
+                .map(Tool1ItemDto::from)
+                .collect(Collectors.toList());
+        model.addAttribute("clientItems", items);
         return "tool_1_items";
     }
 
     @PostMapping("delete-item")
     public String deleteElement(@RequestParam Long id){
-//        task1Service.deleteItem(id);
+        task1Service.deleteItem(id);
         return "redirect:/tool_1/client-items";
     }
 }
