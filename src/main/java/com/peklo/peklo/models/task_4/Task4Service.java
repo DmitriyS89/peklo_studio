@@ -1,50 +1,21 @@
 package com.peklo.peklo.models.task_4;
 
-import com.peklo.peklo.exceptions.ConnectionNotFound;
-import com.peklo.peklo.exceptions.UrlNotConnection;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class
-Task4Service {
+public class Task4Service {
     private final String[] siteVersions = new String[]{"https://", "http://", "https://www.", "http://www."};
-    private String baseUrl = "";
-    private int countCode = 0;
-
-    private void checkUrl(String url, String protocol) {
-        int count = 0;
-        for (String siteVersion : siteVersions) {
-            String format = String.format("^%s", siteVersion);
-            Pattern pattern = Pattern.compile(format);
-            Matcher matcher = pattern.matcher(url);
-            if (matcher.find()) {
-                count++;
-            }
-        }
-        if (count < 1) {
-            baseUrl = protocol + url;
-        } else {
-            baseUrl = url;
-        }
-    }
-    public  String getBaseUrl(String urlFromFront, String protocol) throws UrlNotConnection {
-        checkUrl(urlFromFront, protocol);
-        try {
-            URL url = new URL(baseUrl);
-            url.openStream();
-            return url.getHost();
-        } catch (IOException e) {
-            throw new UrlNotConnection();
-        }
-    }
 
     public List<String> makeRequest(URL uri) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
@@ -52,11 +23,10 @@ Task4Service {
         List<String> result;
         if (responseCode > 199 && responseCode < 300) {
             result = List.of(connection.getURL().toExternalForm(), String.valueOf(responseCode));
-            countCode++;
         } else if (responseCode > 299 && responseCode < 400) {
             result = List.of(connection.getHeaderField("Location"), String.valueOf(responseCode));
         } else {
-            result = List.of("error", null);
+            result = List.of("error", "0");
         }
         return result;
     }
@@ -80,12 +50,19 @@ Task4Service {
         return resultsTask4;
     }
 
-    public  List<Results4Task> results(String baseUrl) {
+    public  List<Results4Task> results(List<String> urls) {
         List<Results4Task> resultsTask4s = new ArrayList<>();
 
         for (String siteVersion : siteVersions) {
-            String format = String.format("%s%s", siteVersion, baseUrl);
-            resultsTask4s.add(checkRedirect(format));
+            for (String url : urls) {
+                if (url.startsWith("https://")){
+                    url = url.substring(8);
+                } else if (url.startsWith("http://")) {
+                    url = url.substring(7);
+                }
+                String format = String.format("%s%s", siteVersion, url);
+                resultsTask4s.add(checkRedirect(format));
+            }
         }
         return setMessagesToResult(resultsTask4s);
     }
@@ -94,11 +71,7 @@ Task4Service {
         for (Results4Task r :
                 results) {
             if (r.getCode() > 199 && r.getCode() < 300) {
-                if (countCode > 1) {
-                    r.setMessage("Дубликат!");
-                } else {
-                    r.setMessage("Успешный запрос!");
-                }
+                r.setMessage("Успешный запрос!");
             } else if(r.getCode()==0){
                 r.setMessage("ошибка соединения");
             } else {
@@ -106,5 +79,18 @@ Task4Service {
             }
         }
         return results;
+    }
+
+    public List<String> urlLinks(Document document) throws URISyntaxException {
+        List<String> links = new ArrayList<>();
+        URI uri = new URI(document.location());
+        String patt = String.format("%s://%s", uri.getScheme(), uri.getHost());
+        Pattern pattern = Pattern.compile(patt);
+        for (Element element : document.select("a[href]")) {
+            String attr = element.attr("abs:href");
+            if(pattern.matcher(attr).find())
+                links.add(attr);
+        }
+        return links;
     }
 }
