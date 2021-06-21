@@ -138,4 +138,12 @@ public class Task1Service {
         }
         return diffs;
     }
+
+    public List<Tool1Item> getItemsWithUserChatId(String chatId) {
+        return (List<Tool1Item>) tool1ItemRepository.findAllByUserChatId(chatId);
+    }
+
+    public void deleteItem(Long id) {
+        tool1ItemRepository.deleteById(id);
+    }
 }
