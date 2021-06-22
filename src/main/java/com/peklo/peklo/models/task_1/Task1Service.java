@@ -11,9 +11,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,15 +122,15 @@ public class Task1Service {
         return stringBuilder.toString();
     }
 
-    public List<LinkedList<DiffMatchPatch.Diff>> foundDiffs(List<Tool1Item> items, List<Document> documents) {
+    public  Map<Tool1Item, LinkedList<DiffMatchPatch.Diff>> foundDiffs(List<Tool1Item> items, List<Document> documents) {
         DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-        List<LinkedList<DiffMatchPatch.Diff>> diffs = new ArrayList<>();
+        Map<Tool1Item, LinkedList<DiffMatchPatch.Diff>> diffs = new HashMap<>();
         for (Document doc : documents) {
             for (Tool1Item item : items) {
                 if (doc.location().equals(item.getFromUrl())) {
                     String nowHtmlValue = doc.select(item.getCssPath()).toString();
                     String oldHtmlValue = item.getHtmlValue();
-                    diffs.add(diffMatchPatch.diffMain(oldHtmlValue, nowHtmlValue, false));
+                    diffs.put(item, diffMatchPatch.diffMain(oldHtmlValue, nowHtmlValue, false));
                 }
             }
         }

@@ -12,10 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -55,55 +52,85 @@ public class Task1BotWork {
 
     @Async
     public void changeAndSave(List<Tool1Item> items) {
-        if (items.size() > 0) {
-            items.forEach(item -> item.setLocalDateTime(LocalDateTime.now()));
-            task1Service.saveAll(items);
+        if (items.size() < 1) return;
 
-            Set<String> strings = items.stream().map(Tool1Item::getFromUrl).collect(Collectors.toSet());
-            List<Document> documents = new ArrayList<>();
-            for (String url : strings) {
-                try {
-                    Document jSoupConnection = task3Service.getJSoupConnection(url);
-                    documents.add(jSoupConnection);
-                } catch (UrlNotConnection urlNotConnection) {
-                    urlNotConnection.printStackTrace();
-                    for (Tool1Item item : items) {
-                        if (item.getFromUrl().equals(url)){
-                            item.setHtmlValue("");
-                        }
-                    }
-                }
+        List<Tool1Item> checkedItems = new ArrayList<>();
+        checkAndFilterItems(items, checkedItems);
+
+        if (checkedItems.size() < 1) return;
+
+        Set<String> urls = checkedItems.stream().map(Tool1Item::getFromUrl).collect(Collectors.toSet());
+        List<Document> documents = new ArrayList<>();
+        for (String url : urls) {
+            try {
+                Document jSoupConnection = task3Service.getJSoupConnection(url);
+                documents.add(jSoupConnection);
+            } catch (UrlNotConnection urlNotConnection) {
+                urlNotConnection.printStackTrace();
             }
-            task1Service.saveAll(items);
-            List<LinkedList<DiffMatchPatch.Diff>> diffs = task1Service.foundDiffs(items, documents);
+        }
 
-            for (int i = 0; i < diffs.size(); i++){
-                StringBuilder stringBuilder = new StringBuilder();
+        Map<Tool1Item, LinkedList<DiffMatchPatch.Diff>> diffs = task1Service.foundDiffs(checkedItems, documents);
+        sendMessages(diffs);
 
-                String stringFromDiff = task1Service.getStringFromDiff(diffs.get(i));
-                stringBuilder.append("Старое: ").append(items.get(i).getHtmlValue()).append("\n\n");
-                stringBuilder.append("Новое : ").append(stringFromDiff).append("\n\n");
+        checkedItems.forEach(item -> item.setLocalDateTime(LocalDateTime.now()));
+        task1Service.saveAll(checkedItems);
+    }
 
-                stringBuilder.append("\n\n");
-                for (DiffMatchPatch.Diff d : diffs.get(i)) {
-                    switch (d.operation){
+    @Async
+    protected void sendMessages(Map<Tool1Item, LinkedList<DiffMatchPatch.Diff>> diffs) {
+        for (Map.Entry<Tool1Item, LinkedList<DiffMatchPatch.Diff>> entry : diffs.entrySet()) {
+
+            Tool1Item item = entry.getKey();
+            LinkedList<DiffMatchPatch.Diff> diff = entry.getValue();
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            String stringFromDiff = task1Service.getStringFromDiff(diff);
+            stringBuilder.append("Старое: ").append(item.getHtmlValue()).append("\n\n");
+            stringBuilder.append("Новое : ").append(stringFromDiff).append("\n\n");
+
+            stringBuilder.append("\n\n");
+            for (DiffMatchPatch.Diff d : diff) {
+                switch (d.operation) {
 //                        case EQUAL:
 //                            stringBuilder.append("Без изменений: ").append(d.text).append("\n");
 //                            break;
-                        case DELETE:
-                            stringBuilder.append("Удалено: ").append(d.text).append("\n");
-                            break;
-                        case INSERT:
-                            stringBuilder.append("Добавлено: ").append(d.text).append("\n");
-                            break;
-                    }
-
+                    case DELETE:
+                        stringBuilder.append("Удалено: ").append(d.text).append("\n");
+                        break;
+                    case INSERT:
+                        stringBuilder.append("Добавлено: ").append(d.text).append("\n");
+                        break;
                 }
 
-                long count = diffs.get(i).stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
-                if(count == 1) stringBuilder.append("Не каких изменений!");
-                task1Service.sendMessage(stringBuilder.toString(), items.get(i).getUserChatId());
             }
+
+            long count = diff.stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
+            if (count == 1) stringBuilder.append("Не каких изменений!");
+            task1Service.sendMessage(stringBuilder.toString(), item.getUserChatId());
+        }
+    }
+
+    @Async
+    protected void checkAndFilterItems(List<Tool1Item> items, List<Tool1Item> checkedItems) {
+        String text = "Сайт: %s\n\n" + "Элемент: %s\n\n" + "Либо:\n" + "%s";
+        for (Tool1Item item : items) {
+            String message, errors;
+            try {
+                task3Service.getJSoupConnection(item.getFromUrl());
+                checkedItems.add(item);
+                continue;
+            } catch (UrlNotConnection urlNotConnection) {
+                urlNotConnection.printStackTrace();
+                errors = "1. Сайт не доступен\n2. Ошибка при загрузке сайта";
+                message = String.format(text, item.getFromUrl(), item.getHtmlValue(), errors);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                illegalArgumentException.printStackTrace();
+                errors = "1. Не правильная ссылка\n2. Пустая ссылка(можете посмотреть на сайте)";
+                message = String.format(text, item.getFromUrl(), item.getHtmlValue(), errors);
+            }
+            task1Service.sendMessage(message, item.getUserChatId());
         }
     }
 }
