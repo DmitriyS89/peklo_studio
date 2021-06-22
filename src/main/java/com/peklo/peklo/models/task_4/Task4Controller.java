@@ -23,7 +23,8 @@ public class Task4Controller {
     @PostMapping("/run")
     public String runTask4(@RequestParam String urlFromFront, Model model) throws UrlNotConnection, URISyntaxException {
         List<String> urlLinks = task4Service.urlLinks(task3Service.getJSoupConnection(urlFromFront));
-        List<Results4Task> results = task4Service.results(urlLinks);
+        List<List<Results4Task>> results4Tasks = task4Service.results(urlLinks);
+        List<Results4Task> results = task4Service.setMessagesToResult(results4Tasks, urlLinks);
         model.addAttribute("results", results);
         model.addAttribute("error", "ok");
         return "tool_4";

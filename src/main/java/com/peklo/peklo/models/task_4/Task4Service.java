@@ -26,7 +26,7 @@ public class Task4Service {
         } else if (responseCode > 299 && responseCode < 400) {
             result = List.of(connection.getHeaderField("Location"), String.valueOf(responseCode));
         } else {
-            result = List.of("error", "0");
+            result = List.of("error", String.valueOf(responseCode));
         }
         return result;
     }
@@ -50,35 +50,50 @@ public class Task4Service {
         return resultsTask4;
     }
 
-    public  List<Results4Task> results(List<String> urls) {
-        List<Results4Task> resultsTask4s = new ArrayList<>();
+    public List<List<Results4Task>> results(List<String> urls) {
+        List<List<Results4Task>> resultsTask4s = new ArrayList<>();
 
         for (String siteVersion : siteVersions) {
+            List<Results4Task> resultsTask4s2 = new ArrayList<>();
             for (String url : urls) {
-                if (url.startsWith("https://")){
+                if (url.startsWith("https://")) {
                     url = url.substring(8);
                 } else if (url.startsWith("http://")) {
                     url = url.substring(7);
                 }
                 String format = String.format("%s%s", siteVersion, url);
-                resultsTask4s.add(checkRedirect(format));
+                resultsTask4s2.add(checkRedirect(format));
             }
+            resultsTask4s.add(resultsTask4s2);
         }
-        return setMessagesToResult(resultsTask4s);
+        return resultsTask4s;
     }
 
-    public List<Results4Task> setMessagesToResult(List<Results4Task> results) {
-        for (Results4Task r :
-                results) {
-            if (r.getCode() > 199 && r.getCode() < 300) {
-                r.setMessage("Успешный запрос!");
-            } else if(r.getCode()==0){
-                r.setMessage("ошибка соединения");
-            } else {
-                r.setMessage("Редирект!");
+    public List<Results4Task> setMessagesToResult(List<List<Results4Task>> results, List<String> urlLinks) {
+        List<Results4Task> results4Tasks = new ArrayList<>();
+        for (List<Results4Task> r : results) {
+            for (int i = 0; i < urlLinks.size(); i++) {
+                boolean b1 = !r.get(i).getUrlTo().equals(urlLinks.get(i));
+                boolean b2 = (r.get(i).getCode() > 199 && r.get(i).getCode() < 300);
+                if (b1 && b2) {
+                    r.get(i).setMessage("Дубликат!");
+                } else {
+                    if (r.get(i).getCode() > 199 && r.get(i).getCode() < 300) {
+                        r.get(i).setMessage("Успешный запрос!");
+                    } else if (r.get(i).getCode() > 299 && r.get(i).getCode() < 400) {
+                        r.get(i).setMessage("Редирект!");
+                    } else if (r.get(i).getCode() > 399 && r.get(i).getCode() < 500) {
+                        r.get(i).setMessage("Запрещено!");
+                    } else if (r.get(i).getCode() > 499) {
+                        r.get(i).setMessage("Серверная ошибка!");
+                    } else {
+                        r.get(i).setMessage("ошибка соединения");
+                    }
+                }
+                results4Tasks.add(r.get(i));
             }
         }
-        return results;
+        return results4Tasks;
     }
 
     public List<String> urlLinks(Document document) throws URISyntaxException {
@@ -88,7 +103,7 @@ public class Task4Service {
         Pattern pattern = Pattern.compile(patt);
         for (Element element : document.select("a[href]")) {
             String attr = element.attr("abs:href");
-            if(pattern.matcher(attr).find())
+            if (pattern.matcher(attr).find())
                 links.add(attr);
         }
         return links;

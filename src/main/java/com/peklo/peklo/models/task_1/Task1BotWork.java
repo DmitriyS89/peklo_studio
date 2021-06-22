@@ -58,18 +58,24 @@ public class Task1BotWork {
         if (items.size() > 0) {
             items.forEach(item -> item.setLocalDateTime(LocalDateTime.now()));
             task1Service.saveAll(items);
+
             Set<String> strings = items.stream().map(Tool1Item::getFromUrl).collect(Collectors.toSet());
             List<Document> documents = new ArrayList<>();
             for (String url : strings) {
                 try {
-                    documents.add(task3Service.getJSoupConnection(url));
+                    Document jSoupConnection = task3Service.getJSoupConnection(url);
+                    documents.add(jSoupConnection);
                 } catch (UrlNotConnection urlNotConnection) {
                     urlNotConnection.printStackTrace();
-                    documents.add(null);
+                    for (Tool1Item item : items) {
+                        if (item.getFromUrl().equals(url)){
+                            item.setHtmlValue("");
+                        }
+                    }
                 }
             }
+            task1Service.saveAll(items);
             List<LinkedList<DiffMatchPatch.Diff>> diffs = task1Service.foundDiffs(items, documents);
-
 
             for (int i = 0; i < diffs.size(); i++){
                 StringBuilder stringBuilder = new StringBuilder();
