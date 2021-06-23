@@ -2,6 +2,7 @@ package com.peklo.peklo.models.task_3;
 
 import com.peklo.peklo.exceptions.UrlNotConnection;
 import com.peklo.peklo.exceptions.UrlNotCorrect;
+import com.peklo.peklo.models.task_5.UserInfo;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -39,7 +40,7 @@ public class Task3ServiceImpl implements Task3Service {
     @Override
     public Task3Element getLink(Element element) {
         String target = getAttr(element, "target");
-        String href = getAttr(element, "href");
+        String href = element.attr("abs:href");
         return new Task3Element(target, href);
     }
 
@@ -114,44 +115,27 @@ public class Task3ServiceImpl implements Task3Service {
     }
 
     @Override
-    public void makeExcel(List<Task3Element> elements, String url) {
-        Map<Integer, String[]> forExcel = new HashMap<>();
-        forExcel.put(0, new String[]{"URL->", url});
-        int count = 1;
-        for (Task3Element element : elements) {
-            String[] value = new String[]{"href->", element.getHref()};
-            forExcel.put(count, value);
-            count++;
-        }
-
+    public File makeExcel(List<Task3Element> elements, String url) {
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet spreadsheet = workbook.createSheet("Data by target attribute");
+        XSSFSheet spreadsheet = workbook.createSheet("Datasets");
         XSSFRow row;
-
-        Set<Integer> keyIds = new HashSet<>(forExcel.keySet());
-
-        int rowId = 0;
-
-        for (int key : keyIds) {
-            row = spreadsheet.createRow(rowId);
-            rowId++;
-
-            Object[] objectArr = forExcel.get(key);
-            int cellId = 0;
-            for (Object obj : objectArr) {
-                Cell cell = row.createCell(cellId);
-                cell.setCellValue((String) obj);
-                cellId++;
-            }
+        row = spreadsheet.createRow(0);
+        row.createCell(0).setCellValue("Сайт");
+        row.createCell(1).setCellValue(url);
+        for (int i = 0; i < elements.size(); i++) {
+            Task3Element userInfo = elements.get(i);
+            row = spreadsheet.createRow(i + 1);
+            row.createCell(0).setCellValue("href");
+            row.createCell(1).setCellValue(userInfo.getHref());
         }
-
+        File file = new File("result.xlsx");
         try {
-            FileOutputStream out = new FileOutputStream(
-                    new File(urlForExcel));
-            workbook.write(out);
-            out.close();
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return file;
     }
 }

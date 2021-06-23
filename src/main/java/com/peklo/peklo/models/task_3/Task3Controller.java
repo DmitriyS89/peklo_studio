@@ -20,9 +20,11 @@ public class Task3Controller {
         Document document = task3ServiceImpl.getJSoupConnection(url);
         SiteWithDomain siteWith3rdDomain = task3ServiceImpl.makeSiteEntity(url);
         List<Task3Element> results = task3ServiceImpl.filterPatterns(task3ServiceImpl.getLinks(document), siteWith3rdDomain);
-        model.addAttribute("results", task3ServiceImpl.filter((results)));
+        List<Task3Element> filter = task3ServiceImpl.filter(results);
+        model.addAttribute("results", filter);
         model.addAttribute("error", "ok");
         model.addAttribute("fromUrl", url);
+        task3ServiceImpl.makeExcel(filter, url);
         return "tool_3";
     }
 

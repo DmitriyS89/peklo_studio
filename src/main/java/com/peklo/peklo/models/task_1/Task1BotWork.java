@@ -84,31 +84,26 @@ public class Task1BotWork {
             Tool1Item item = entry.getKey();
             LinkedList<DiffMatchPatch.Diff> diff = entry.getValue();
 
-            StringBuilder stringBuilder = new StringBuilder();
-
             String stringFromDiff = task1Service.getStringFromDiff(diff);
-            stringBuilder.append("Старое: ").append(item.getHtmlValue()).append("\n\n");
-            stringBuilder.append("Новое : ").append(stringFromDiff).append("\n\n");
-
-            stringBuilder.append("\n\n");
+            task1Service.sendMessage("Id элемента: " + item.getId(), item.getUserChatId());
+            task1Service.sendMessage("Сайт: " + item.getFromUrl(), item.getUserChatId());
+            task1Service.sendMessage("Сохранённый: " + item.getHtmlValue(), item.getUserChatId());
+            task1Service.sendMessage("Новое: " + stringFromDiff, item.getUserChatId());
+            int size = 0;
             for (DiffMatchPatch.Diff d : diff) {
                 switch (d.operation) {
-//                        case EQUAL:
-//                            stringBuilder.append("Без изменений: ").append(d.text).append("\n");
-//                            break;
                     case DELETE:
-                        stringBuilder.append("Удалено: ").append(d.text).append("\n");
+                        task1Service.sendMessage(size + ". Удалено: " + d.text, item.getUserChatId());
                         break;
                     case INSERT:
-                        stringBuilder.append("Добавлено: ").append(d.text).append("\n");
+                        task1Service.sendMessage(size + ". Добавлено: " + d.text, item.getUserChatId());
                         break;
                 }
-
+                size++;
             }
 
             long count = diff.stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
-            if (count == 1) stringBuilder.append("Не каких изменений!");
-            task1Service.sendMessage(stringBuilder.toString(), item.getUserChatId());
+            if (count == 1) task1Service.sendMessage("Не каких изменений!", item.getUserChatId());
         }
     }
 
