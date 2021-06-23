@@ -3,8 +3,14 @@
 <@main.renderWith>
     <h1 class="mt-4">Tool 1</h1>
     <div class="container-fluid">
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
+        <p>*** Вставьте (любую) ссылку в поле.</p>
+        <p>***
+        <ul>
+            <li>Если в <b>Скрипты</b> поставили галку то скрипты внутри сайта удалятся. </li>
+            <li>Если в <b>Скрипты</b> убрали галку то скрипты внутри сайта не удалятся. </li>
+        </ul>
+        Это нужно для некоторых сайтов где скрипты мешают 1-му инструменту.
+        </p>
         <p>*** There will be information of instrument</p>
 
         <a href="/tool_1/client-items">
