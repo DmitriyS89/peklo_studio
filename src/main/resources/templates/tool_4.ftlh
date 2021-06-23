@@ -16,7 +16,7 @@
                 </div>
             <#elseif error = "not-correct">
                 <div class="bg-warning px-2">
-                    Введнённый url не правильный!
+                    Введённый url не правильный!
                 </div>
             <#elseif error = "ok">
                 <div class="bg-success px-2 text-dark">
@@ -33,7 +33,7 @@
             <#--                </select>-->
             <#--            </div>-->
             <div class="form-group">
-                <input required type="text" class="form-control" name="urlFromFront" id="exampleFormControlInput1"
+                <input required type="url" class="form-control" name="urlFromFront" id="exampleFormControlInput1"
                        placeholder="domain">
             </div>
             <div class="form-group">
