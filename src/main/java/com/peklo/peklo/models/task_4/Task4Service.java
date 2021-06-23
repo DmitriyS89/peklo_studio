@@ -1,9 +1,15 @@
 package com.peklo.peklo.models.task_4;
 
+import com.peklo.peklo.models.task_3.Task3Element;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -107,5 +113,36 @@ public class Task4Service {
                 links.add(attr);
         }
         return links;
+    }
+
+    public File makeExcel(List<Results4Task> elements, String url) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet spreadsheet = workbook.createSheet("Datasets");
+        XSSFRow row;
+        row = spreadsheet.createRow(0);
+        row.createCell(0).setCellValue("Сайт");
+        row.createCell(1).setCellValue(url);
+        for (int i = 0; i < elements.size(); i++) {
+            Results4Task userInfo = elements.get(i);
+            row = spreadsheet.createRow(i + 1);
+            row.createCell(0).setCellValue("Откуда");
+            row.createCell(1).setCellValue(userInfo.getUrlFrom());
+            row.createCell(6).setCellValue("Куда");
+            row.createCell(7).setCellValue(userInfo.getUrlTo());
+            row.createCell(12).setCellValue("Код");
+            row.createCell(13).setCellValue(userInfo.getCode());
+            row.createCell(14).setCellValue("Сообщения");
+            row.createCell(16).setCellValue(userInfo.getMessage());
+
+        }
+        File file = new File("result.xlsx");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }

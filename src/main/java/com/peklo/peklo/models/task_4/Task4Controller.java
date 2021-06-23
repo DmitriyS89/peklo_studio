@@ -25,6 +25,7 @@ public class Task4Controller {
         List<String> urlLinks = task4Service.urlLinks(task3Service.getJSoupConnection(urlFromFront));
         List<List<Results4Task>> results4Tasks = task4Service.results(urlLinks);
         List<Results4Task> results = task4Service.setMessagesToResult(results4Tasks, urlLinks);
+        task4Service.makeExcel(results, urlFromFront);
         model.addAttribute("results", results);
         model.addAttribute("error", "ok");
         return "tool_4";

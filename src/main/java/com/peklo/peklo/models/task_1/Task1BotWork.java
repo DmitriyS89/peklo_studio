@@ -89,7 +89,7 @@ public class Task1BotWork {
             task1Service.sendMessage("Сайт: " + item.getFromUrl(), item.getUserChatId());
             task1Service.sendMessage("Сохранённый: " + item.getHtmlValue(), item.getUserChatId());
             task1Service.sendMessage("Новое: " + stringFromDiff, item.getUserChatId());
-            int size = 1;
+            int size = 0;
             for (DiffMatchPatch.Diff d : diff) {
                 switch (d.operation) {
                     case DELETE:
