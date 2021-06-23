@@ -1,6 +1,7 @@
 package com.peklo.peklo.models.task_5;
 
-import org.apache.poi.ss.usermodel.Cell;
+import com.peklo.peklo.exceptions.ConnectionNotFound;
+import com.peklo.peklo.exceptions.UserMailNotFound;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,15 +23,16 @@ public class Task5Service {
 
     private static final String NULL = "NULL";
 
-    public void start(String id, String mail, String type) {
+    public void start(String id, String mail, String type, String urlFromFront) {
         if ("user".equals(type)) {
             String userInfo = getUserInfo(id);
             List<UserInfo> users = parseJSON(userInfo);
-            File file = makeExcel(users);
+            File file = makeExcel(users, urlFromFront);
 //            sendMail(file, mail);
-        } else if("group".equals(type)) {
+        } else if ("group".equals(type)) {
+            findGroup(id);
             List<UserInfo> group1 = getGroup(id);
-            File file = makeExcel(group1);
+            File file = makeExcel(group1, urlFromFront);
 //            sendMail(file, mail);
         }
     }
@@ -41,7 +43,7 @@ public class Task5Service {
             URL url = vkApiUrlBuilder("groups.getById", params, access_token);
             String vkApiAnswer = getVkApiAnswer(url);
             if (!Pattern.compile("response").matcher(vkApiAnswer).find()) {
-                return NULL;
+                throw new ConnectionNotFound();
             }
             return vkApiAnswer;
         } catch (IOException e) {
@@ -56,7 +58,7 @@ public class Task5Service {
             URL url = vkApiUrlBuilder("users.get", params, access_token);
             String vkApiAnswer = getVkApiAnswer(url);
             if (!Pattern.compile("response").matcher(vkApiAnswer).find()) {
-                return NULL;
+                throw new UserMailNotFound();
             }
             return vkApiAnswer;
         } catch (IOException e) {
@@ -98,38 +100,25 @@ public class Task5Service {
         return page.toString();
     }
 
-    private File makeExcel(List<UserInfo> data) {
-        Map<Integer, String[]> forExcel = new HashMap<>();
-//        forExcel.put(0, new String[]{"URL->", url});
-        int count = 1;
-        for (UserInfo element : data) {
-            String[] value = new String[]{
-                    "Имя", element.getUserName(),
-                    "Адрес", element.getUserMail(),
-                    "номер", element.getUserNumber()};
-            forExcel.put(count, value);
-            count++;
-        }
+    private File makeExcel(List<UserInfo> data, String url) {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet spreadsheet = workbook.createSheet("Data by target attribute");
+        XSSFSheet spreadsheet = workbook.createSheet("Datasets");
         XSSFRow row;
+        row = spreadsheet.createRow(0);
+        row.createCell(0).setCellValue("Сайт");
+        row.createCell(1).setCellValue(url);
+        for (int i = 0; i < data.size(); i++) {
+            UserInfo userInfo = data.get(i);
+            row = spreadsheet.createRow(i + 1);
 
-        Set<Integer> keyIds = new HashSet<>(forExcel.keySet());
+            row.createCell(0).setCellValue("_Имя_");
+            row.createCell(1).setCellValue(userInfo.getUserName());
+            row.createCell(4).setCellValue("Номер");
+            row.createCell(5).setCellValue(userInfo.getUserNumber());
+            row.createCell(7).setCellValue("Адрес");
+            row.createCell(8).setCellValue(userInfo.getUserMail());
 
-        int rowId = 0;
-
-        for (int key : keyIds) {
-            row = spreadsheet.createRow(rowId);
-            rowId++;
-
-            Object[] objectArr = forExcel.get(key);
-            int cellId = 0;
-            for (Object obj : objectArr) {
-                Cell cell = row.createCell(cellId);
-                cell.setCellValue((String) obj);
-                cellId++;
-            }
         }
         File file = new File("result.xlsx");
         try {
@@ -142,21 +131,21 @@ public class Task5Service {
         return file;
     }
 
-    private List<UserInfo> parseJSON (String json) {
+    private List<UserInfo> parseJSON(String json) {
         List<UserInfo> users = new ArrayList<>();
         JSONObject object = new JSONObject(json);
         JSONArray response = object.getJSONArray("response");
         for (int i = 0; i < response.length(); i++) {
             JSONObject jsonObject = response.getJSONObject(i);
-            String firstName = jsonObject.optString("first_name", "null");
-            String lastName = jsonObject.optString("last_name", "null");
-            String mobileNumber = jsonObject.optString("mobile_phone", "Информация отсутствует");
-            users.add(new UserInfo(String.format("%s %s", firstName, lastName), mobileNumber, "Информация отсутствует"));
+            String firstName = jsonObject.optString("first_name", "");
+            String lastName = jsonObject.optString("last_name", "");
+            String mobileNumber = jsonObject.optString("mobile_phone", "пусто");
+            users.add(new UserInfo(String.format("%s %s", firstName, lastName), mobileNumber, "пусто"));
         }
         return users;
     }
 
-    public String getConcatId(String groupId, Integer offset){
+    public String getConcatId(String groupId, Integer offset) {
         String params = String.format("group_id=%s&sort=id_asc&offset=%s&count=%s", groupId, offset, 1000);
         try {
             URL url = vkApiUrlBuilder("groups.getMembers", params, access_token);
@@ -193,6 +182,7 @@ public class Task5Service {
         }
         return result;
     }
+
     public String cutUrlGroup(String url) {
         String result = "";
         if (!Pattern.compile("m\\.vk\\.com").matcher(url).find()) {

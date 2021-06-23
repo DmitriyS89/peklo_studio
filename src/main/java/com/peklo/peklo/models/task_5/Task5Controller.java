@@ -1,5 +1,6 @@
 package com.peklo.peklo.models.task_5;
 
+import com.peklo.peklo.exceptions.UrlNotCorrect;
 import com.peklo.peklo.models.User.User;
 import com.peklo.peklo.models.User.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,15 @@ public class Task5Controller {
     @GetMapping("result")
     public String tool4(@RequestParam(name = "success", defaultValue = "") String clientError,
                         Model model){
-        String error = "NULL".equals(clientError) ? "null" : clientError;
         model.addAttribute("success",clientError);
         return "tool_5";
     }
 
     @PostMapping("/run")
     public String run (@RequestParam String urlFromFront, @RequestParam String social, Principal principal, @RequestParam String kind){
+        if(!urlFromFront.startsWith("https://vk.com") && !urlFromFront.startsWith("https://m.vk.com")){
+            throw new UrlNotCorrect();
+        }
         User user = userService.findByEmail(principal.getName());
         String id = "";
         if("group".equals(kind)) {
@@ -36,8 +39,8 @@ public class Task5Controller {
         } else if("user".equals(kind)) {
             id = service.cutUrlUser(urlFromFront);
         }
-        if (id.equals("")) throw new RuntimeException();
-        service.start(id, user.getEmail(), kind);
+        if (id.equals("")) throw new UrlNotCorrect();
+        service.start(id, user.getEmail(), kind, urlFromFront);
         return "redirect:result?success=true";
     }
 }
