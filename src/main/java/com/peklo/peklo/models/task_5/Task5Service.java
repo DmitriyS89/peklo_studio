@@ -2,6 +2,8 @@ package com.peklo.peklo.models.task_5;
 
 import com.peklo.peklo.exceptions.ConnectionNotFound;
 import com.peklo.peklo.exceptions.UserMailNotFound;
+import com.peklo.peklo.models.User.MailSender;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,24 +18,27 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class Task5Service {
 
     @Value("${vkApiToken}")
     private String access_token;
 
     private static final String NULL = "NULL";
+    private final MailSender mailSender;
 
     public void start(String id, String mail, String type, String urlFromFront) {
         if ("user".equals(type)) {
             String userInfo = getUserInfo(id);
             List<UserInfo> users = parseJSON(userInfo);
             File file = makeExcel(users, urlFromFront);
-//            sendMail(file, mail);
+            mailSender.sendMailWithAttachment(mail, "Tool 5", "some", file.getAbsolutePath());
         } else if ("group".equals(type)) {
             findGroup(id);
             List<UserInfo> group1 = getGroup(id);
             File file = makeExcel(group1, urlFromFront);
-//            sendMail(file, mail);
+            mailSender.sendMailWithAttachment(mail, "Tool 5", "some", file.getPath());
+
         }
     }
 
