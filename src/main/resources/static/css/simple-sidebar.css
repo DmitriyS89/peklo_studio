@@ -97,3 +97,26 @@
   overflow: hidden;
   text-overflow:ellipsis;
 }
+.table_col {
+  width: 1400px;
+  background: white;
+  text-align: left;
+  border-collapse: collapse;
+  color: black;
+}
+.table_col th:first-child, .table_col td:first-child {
+  color: black;
+  border-left: none;
+}
+.table_col th{
+  border-bottom: 2px solid #F5E1A6;
+  border-right: 20px solid white;
+  border-left: 20px solid white;
+  padding: 8px 10px;
+}
+.table_col td{
+  border-right: 20px solid white;
+  border-left: 20px solid white;
+  padding: 12px 10px;
+  color: black;
+}
