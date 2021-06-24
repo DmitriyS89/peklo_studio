@@ -56,16 +56,16 @@
                     <tr>
                         <td>${r.code}</td>
                         <td><a href="${r.urlFrom}"><#assign minititle=(r.urlFrom!"")>
-                                <#if minititle?length &lt; 20>
+                                <#if minititle?length &lt; 24>
                                     ${minititle}
                                 <#else>
-                                    ${minititle?substring(0,19)} ...
+                                    ${minititle?substring(0,23)} ...
                                 </#if></a></td>
                         <td><a href="${r.urlTo}"><#assign minititle=(r.urlTo!"")>
-                                <#if minititle?length &lt; 20>
+                                <#if minititle?length &lt; 24>
                                     ${minititle}
                                 <#else>
-                                    ${minititle?substring(0,19)} ...
+                                    ${minititle?substring(0,23)} ...
                                 </#if></a></td>
                         <td>${r.message}</td>
                     </tr>
