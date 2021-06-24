@@ -1,50 +1,27 @@
 package com.peklo.peklo.models.task_4;
 
-import com.peklo.peklo.exceptions.ConnectionNotFound;
-import com.peklo.peklo.exceptions.UrlNotConnection;
+import com.peklo.peklo.models.task_3.Task3Element;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class
-Task4Service {
+public class Task4Service {
     private final String[] siteVersions = new String[]{"https://", "http://", "https://www.", "http://www."};
-    private String baseUrl = "";
-    private int countCode = 0;
-
-    private void checkUrl(String url, String protocol) {
-        int count = 0;
-        for (String siteVersion : siteVersions) {
-            String format = String.format("^%s", siteVersion);
-            Pattern pattern = Pattern.compile(format);
-            Matcher matcher = pattern.matcher(url);
-            if (matcher.find()) {
-                count++;
-            }
-        }
-        if (count < 1) {
-            baseUrl = protocol + url;
-        } else {
-            baseUrl = url;
-        }
-    }
-    public  String getBaseUrl(String urlFromFront, String protocol) throws UrlNotConnection {
-        checkUrl(urlFromFront, protocol);
-        try {
-            URL url = new URL(baseUrl);
-            url.openStream();
-            return url.getHost();
-        } catch (IOException e) {
-            throw new UrlNotConnection();
-        }
-    }
 
     public List<String> makeRequest(URL uri) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) uri.openConnection();
@@ -52,11 +29,10 @@ Task4Service {
         List<String> result;
         if (responseCode > 199 && responseCode < 300) {
             result = List.of(connection.getURL().toExternalForm(), String.valueOf(responseCode));
-            countCode++;
         } else if (responseCode > 299 && responseCode < 400) {
             result = List.of(connection.getHeaderField("Location"), String.valueOf(responseCode));
         } else {
-            result = List.of("error", null);
+            result = List.of("error", String.valueOf(responseCode));
         }
         return result;
     }
@@ -80,31 +56,93 @@ Task4Service {
         return resultsTask4;
     }
 
-    public  List<Results4Task> results(String baseUrl) {
-        List<Results4Task> resultsTask4s = new ArrayList<>();
+    public List<List<Results4Task>> results(List<String> urls) {
+        List<List<Results4Task>> resultsTask4s = new ArrayList<>();
 
         for (String siteVersion : siteVersions) {
-            String format = String.format("%s%s", siteVersion, baseUrl);
-            resultsTask4s.add(checkRedirect(format));
+            List<Results4Task> resultsTask4s2 = new ArrayList<>();
+            for (String url : urls) {
+                if (url.startsWith("https://")) {
+                    url = url.substring(8);
+                } else if (url.startsWith("http://")) {
+                    url = url.substring(7);
+                }
+                String format = String.format("%s%s", siteVersion, url);
+                resultsTask4s2.add(checkRedirect(format));
+            }
+            resultsTask4s.add(resultsTask4s2);
         }
-        return setMessagesToResult(resultsTask4s);
+        return resultsTask4s;
     }
 
-    public List<Results4Task> setMessagesToResult(List<Results4Task> results) {
-        for (Results4Task r :
-                results) {
-            if (r.getCode() > 199 && r.getCode() < 300) {
-                if (countCode > 1) {
-                    r.setMessage("Дубликат!");
+    public List<Results4Task> setMessagesToResult(List<List<Results4Task>> results, List<String> urlLinks) {
+        List<Results4Task> results4Tasks = new ArrayList<>();
+        for (List<Results4Task> r : results) {
+            for (int i = 0; i < urlLinks.size(); i++) {
+                boolean b1 = !r.get(i).getUrlTo().equals(urlLinks.get(i));
+                boolean b2 = (r.get(i).getCode() > 199 && r.get(i).getCode() < 300);
+                if (b1 && b2) {
+                    r.get(i).setMessage("Дубликат!");
                 } else {
-                    r.setMessage("Успешный запрос!");
+                    if (r.get(i).getCode() > 199 && r.get(i).getCode() < 300) {
+                        r.get(i).setMessage("Успешный запрос!");
+                    } else if (r.get(i).getCode() > 299 && r.get(i).getCode() < 400) {
+                        r.get(i).setMessage("Редирект!");
+                    } else if (r.get(i).getCode() > 399 && r.get(i).getCode() < 500) {
+                        r.get(i).setMessage("Запрещено!");
+                    } else if (r.get(i).getCode() > 499) {
+                        r.get(i).setMessage("Серверная ошибка!");
+                    } else {
+                        r.get(i).setMessage("ошибка соединения");
+                    }
                 }
-            } else if(r.getCode()==0){
-                r.setMessage("ошибка соединения");
-            } else {
-                r.setMessage("Редирект!");
+                results4Tasks.add(r.get(i));
             }
         }
-        return results;
+        return results4Tasks;
+    }
+
+    public List<String> urlLinks(Document document) throws URISyntaxException {
+        List<String> links = new ArrayList<>();
+        URI uri = new URI(document.location());
+        String patt = String.format("%s://%s", uri.getScheme(), uri.getHost());
+        Pattern pattern = Pattern.compile(patt);
+        for (Element element : document.select("a[href]")) {
+            String attr = element.attr("abs:href");
+            if (pattern.matcher(attr).find())
+                links.add(attr);
+        }
+        return links;
+    }
+
+    public File makeExcel(List<Results4Task> elements, String url) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet spreadsheet = workbook.createSheet("Datasets");
+        XSSFRow row;
+        row = spreadsheet.createRow(0);
+        row.createCell(0).setCellValue("Сайт");
+        row.createCell(1).setCellValue(url);
+        for (int i = 0; i < elements.size(); i++) {
+            Results4Task userInfo = elements.get(i);
+            row = spreadsheet.createRow(i + 1);
+            row.createCell(0).setCellValue("Откуда");
+            row.createCell(1).setCellValue(userInfo.getUrlFrom());
+            row.createCell(6).setCellValue("Куда");
+            row.createCell(7).setCellValue(userInfo.getUrlTo());
+            row.createCell(12).setCellValue("Код");
+            row.createCell(13).setCellValue(userInfo.getCode());
+            row.createCell(14).setCellValue("Сообщения");
+            row.createCell(16).setCellValue(userInfo.getMessage());
+
+        }
+        File file = new File("result.xlsx");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }

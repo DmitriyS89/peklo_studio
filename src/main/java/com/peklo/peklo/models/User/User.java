@@ -21,6 +21,8 @@ public class User {
     private String username;
 //    @Email @NotBlank
     private String email;
+
+    private String chatId = "";
 //    @Min(8) @NotBlank
     private String password;
     //    @NotNull

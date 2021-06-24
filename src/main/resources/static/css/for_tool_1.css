@@ -1,0 +1,79 @@
+button, a, input {
+    pointer-events: none;
+}
+
+.red-line-tool1 {
+    border: 1px solid crimson;
+}
+
+#tool_1_modal_window {
+    z-index: 100000 !important;
+    user-select: none !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal_window {
+    font-family: Arial, "Times New Roman", serif !important;
+    color: black !important;
+    border-radius: 40px !important;
+    width: 30% !important;
+    margin: 30px auto auto !important;
+    background: white !important;
+}
+
+.modal_header {
+    font-size: 16px !important;
+    padding: 10px!important;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.3) !important;
+}
+
+.modal_body {
+    padding: 5px 25px 0 25px !important;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.3) !important;
+}
+
+.modal_body .times{
+    display: flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.times .time{
+    width: 30%;
+    margin: auto;
+    height: 21px;
+}
+
+.times .time input{
+    width: 100%;
+}
+
+.modal_footer {
+    width: 100% !important;
+    display:flex !important;
+}
+
+.modal_footer button {
+    pointer-events: auto !important;
+    display: block !important;
+    width: 40% !important;
+    height: 50% !important;
+    margin: 20px !important;
+}
+
+.tool_1_buttons{
+    font-family: Arial, "Times New Roman", serif !important;
+    color: black !important;
+    z-index: 100000 !important;
+    position: fixed !important;
+    width: 100px !important;
+}
+.tool_1_buttons button{
+    pointer-events: auto !important;
+    width: 100px !important;
+    height: 39px !important;
+    padding: 10px !important;
+}

@@ -4,6 +4,7 @@ import com.peklo.peklo.exceptions.UrlNotConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -27,5 +28,5 @@ public interface Task3Service {
 
     SiteWithDomain makeSiteEntity(String url);
 
-    void makeExcel(List<Task3Element> elements, String url);
+    File makeExcel(List<Task3Element> elements, String url);
 }

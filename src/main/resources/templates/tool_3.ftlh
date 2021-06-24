@@ -40,8 +40,11 @@
             <table class="table">
                 <thead class="thead-light">
                 <tr>
+                    <th scope="col">Сайт</th>
+                    <th scope="col">${fromUrl}</th>
+                </tr>
+                <tr>
                     <th scope="col">#</th>
-                    <#--                    <th scope="col">От-Куда</th>-->
                     <th scope="col">Ссылки</th>
                 </tr>
                 </thead>
@@ -49,8 +52,7 @@
                 <#list results as r>
                     <tr>
                         <th scope="row">${r?index + 1}</th>
-                        <#--                        <td>${r.target}</td>-->
-                        <td><a href="${r.href}">${r.href}</a></td>
+                        <td><a href="${r.href}"><p class="myP">${r.href}</p></a></td>
                     </tr>
                 </#list>
                 </tbody>
