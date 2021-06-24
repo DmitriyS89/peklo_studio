@@ -45,27 +45,33 @@
         </form>
 
         <#if results ??>
-            <table class="table">
-                <thead class="thead-light">
+            <table class="table_col">
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">От-Куда</th>
-                    <th scope="col">Куда</th>
-                    <th scope="col">Инфо</th>
+                    <th>#</th>
+                    <th>От-Куда</th>
+                    <th>Куда</th>
+                    <th>Инфо</th>
                 </tr>
-                </thead>
-                <tbody>
                 <#list results as r>
                     <tr>
-                        <th scope="row">${r.code}</th>
-                        <td><a href="${r.urlFrom}">${r.urlFrom}</a></td>
-                        <td><a href="${r.urlTo}">${r.urlTo}</a></td>
+                        <td>${r.code}</td>
+                        <td><a href="${r.urlFrom}"><#assign minititle=(r.urlFrom!"")>
+                                <#if minititle?length &lt; 24>
+                                    ${minititle}
+                                <#else>
+                                    ${minititle?substring(0,23)} ...
+                                </#if></a></td>
+                        <td><a href="${r.urlTo}"><#assign minititle=(r.urlTo!"")>
+                                <#if minititle?length &lt; 24>
+                                    ${minititle}
+                                <#else>
+                                    ${minititle?substring(0,23)} ...
+                                </#if></a></td>
                         <td>${r.message}</td>
                     </tr>
                 </#list>
-                </tbody>
-
             </table>
         </#if>
     </div>
+
 </@main.renderWith>

@@ -31,7 +31,13 @@
                 <#list clientItems as item>
                     <tr>
                         <td class="width15">${item.id}</a></td>
-                        <td class="width30"><a href="${item.url}"><p class="myP">${item.url}</p></a></td>
+                        <td class="width30"><a href="${item.url}"><p>
+                                    <#assign minititle=(item.url!"")>
+                                    <#if minititle?length &lt; 35>
+                                        ${minititle}
+                                    <#else>
+                                        ${minititle?substring(0,34)} ...
+                                    </#if></p></a></td>
                         <td class="width20">каждые ${item.time}</td>
                         <td class="width15" style="color: ${item.htmlValueState}">${item.htmlValueState}</td>
                         <td class="width15">
