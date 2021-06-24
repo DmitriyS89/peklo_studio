@@ -85,33 +85,47 @@ public class Task1BotWork {
             LinkedList<DiffMatchPatch.Diff> diff = entry.getValue();
 
             String stringFromDiff = task1Service.getStringFromDiff(diff);
-            task1Service.sendMessage("Id элемента: " + item.getId(), item.getUserChatId());
-            task1Service.sendMessage("Сайт: " + item.getFromUrl(), item.getUserChatId());
-            task1Service.sendMessage("Сохранённый: " + item.getHtmlValue(), item.getUserChatId());
-            task1Service.sendMessage("Новое: " + stringFromDiff, item.getUserChatId());
-            int size = 0;
-            for (DiffMatchPatch.Diff d : diff) {
-                switch (d.operation) {
-                    case DELETE:
-                        task1Service.sendMessage(size + ". Удалено: " + d.text, item.getUserChatId());
-                        break;
-                    case INSERT:
-                        task1Service.sendMessage(size + ". Добавлено: " + d.text, item.getUserChatId());
-                        break;
-                }
-                size++;
-            }
+            String userChatId = item.getUserChatId();
+            task1Service.sendMessage("Время Проверки" + "_".repeat(40), userChatId);
+            task1Service.sendMessage("ID: " + item.getId(), userChatId);
+            task1Service.sendMessage("Сайт: " + item.getFromUrl(), userChatId);
+            task1Service.sendMessage("Сохранённый:", userChatId);
+            task1Service.sendMessage(item.getHtmlValue(), userChatId);
+            task1Service.sendMessage("Новое:", userChatId);
+            task1Service.sendMessage(stringFromDiff, userChatId);
 
             long count = diff.stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
-            if (count == 1) task1Service.sendMessage("Не каких изменений!", item.getUserChatId());
+            if (count == 1) {
+                task1Service.sendMessage("Не каких изменений!", userChatId);
+            } else {
+                int size = 1;
+                for (DiffMatchPatch.Diff d : diff) {
+                    switch (d.operation) {
+                        case DELETE:
+                            task1Service.sendMessage(size + ". Удалено:", userChatId);
+                            task1Service.sendMessage(d.text, userChatId);
+                            break;
+                        case EQUAL:
+                            task1Service.sendMessage(size + ". Без изменений:", userChatId);
+                            task1Service.sendMessage(d.text, userChatId);
+                            break;
+                        case INSERT:
+                            task1Service.sendMessage(size + ". Добавлено:", userChatId);
+                            task1Service.sendMessage(d.text, userChatId);
+                            break;
+                    }
+                    size++;
+                }
+            }
+            task1Service.sendMessage("_".repeat(50), userChatId);
         }
     }
 
     @Async
     protected void checkAndFilterItems(List<Tool1Item> items, List<Tool1Item> checkedItems) {
-        String text = "Сайт: %s\n\n" + "Элемент: %s\n\n" + "Либо:\n" + "%s";
         for (Tool1Item item : items) {
-            String message, errors;
+            String errors;
+            String userChatId = item.getUserChatId();
             try {
                 task3Service.getJSoupConnection(item.getFromUrl());
                 checkedItems.add(item);
@@ -119,13 +133,17 @@ public class Task1BotWork {
             } catch (UrlNotConnection urlNotConnection) {
                 urlNotConnection.printStackTrace();
                 errors = "1. Сайт не доступен\n2. Ошибка при загрузке сайта";
-                message = String.format(text, item.getFromUrl(), item.getHtmlValue(), errors);
             } catch (IllegalArgumentException illegalArgumentException) {
                 illegalArgumentException.printStackTrace();
-                errors = "1. Не правильная ссылка\n2. Пустая ссылка(можете посмотреть на сайте)";
-                message = String.format(text, item.getFromUrl(), item.getHtmlValue(), errors);
+                errors = "1. Не правильная ссылка\n2. Пустая ссылка";
             }
-            task1Service.sendMessage(message, item.getUserChatId());
+            task1Service.sendMessage("Ошибка" + "_".repeat(45), userChatId);
+            task1Service.sendMessage("ID: " + item.getId(), userChatId);
+            task1Service.sendMessage("Сайт: " + item.getFromUrl(), userChatId);
+            task1Service.sendMessage("Элемент:", userChatId);
+            task1Service.sendMessage(item.getHtmlValue(), userChatId);
+            task1Service.sendMessage(String.format("Либо:\n%s", errors), userChatId);
+            task1Service.sendMessage("_".repeat(45), userChatId);
         }
     }
 }
