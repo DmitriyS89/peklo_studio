@@ -22,7 +22,7 @@ function preparationTime() {
     let timeNumber = document.getElementById("timeNumber").value;
     let timeType = document.getElementById("time_type").value;
     if(timeNumber < 1) timeNumber = 1;
-    return timeType + timeNumber;
+    return timeType + Math.round(timeNumber);
 }
 
 function saveDatasets() {
