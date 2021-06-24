@@ -9,13 +9,13 @@
 
         <div>
             <label class="d-flex"> Ссылка на telegram бота
-                <input type="text" class="w-100" name="telegram-link" readonly value="http://t.me/peklo_tool_1_bot">
-                <button type="button" class="btn btn-light">copy</button>
+                <input id="btn1_" type="text" class="w-100" name="telegram-link" readonly value="http://t.me/peklo_tool_1_bot">
+                <button type="button" class="btn btn-light" onclick="myFunction1()">copy</button>
             </label>
             <label class="d-flex"> Ваш токен для подтверждения аккаунта
-                <input type="text" class="w-100" name="telegram-accept-token" readonly
+                <input id="btn2_" type="text" class="w-100" name="telegram-accept-token" readonly
                        value="${userToken}">
-                <button type="button" class="btn btn-light">copy</button>
+                <button type="button" class="btn btn-light" onclick="myFunction2()">copy</button>
             </label>
             <form action="/telegram-bot/new-token-for-user" method="post">
                 <input type="hidden" name="userId" value="${userId}">
@@ -43,4 +43,16 @@
             </div>
         </#if>
     </div>
+    <script type="text/javascript">
+        function myFunction1() {
+            let copyText = document.getElementById("btn1_");
+            copyText.select();
+            document.execCommand("copy");
+        }
+        function myFunction2() {
+            let copyText = document.getElementById("btn2_");
+            copyText.select();
+            document.execCommand("copy");
+        }
+    </script>
 </@main.renderWith>
