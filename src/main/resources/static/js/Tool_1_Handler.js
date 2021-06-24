@@ -21,8 +21,8 @@ function refreshAll() {
 function preparationTime() {
     let timeNumber = document.getElementById("timeNumber").value;
     let timeType = document.getElementById("time_type").value;
-
-    return timeType + timeNumber;
+    if(timeNumber < 1) timeNumber = 1;
+    return timeType + Math.round(timeNumber);
 }
 
 function saveDatasets() {
