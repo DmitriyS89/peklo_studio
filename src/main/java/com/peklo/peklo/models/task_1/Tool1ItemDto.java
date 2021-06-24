@@ -11,6 +11,7 @@ public class Tool1ItemDto {
 
     private Long id;
     private String url;
+    private String size;
     private String htmlValueState;
     private String time;
 
@@ -26,6 +27,7 @@ public class Tool1ItemDto {
                 timeString = String.format("%s дня/дней", time[1]);
                 break;
         }
-        return new Tool1ItemDto(item.getId(), item.getFromUrl(), state, timeString);
+        String size = String.valueOf(item.getHtmlValue().length());
+        return new Tool1ItemDto(item.getId(), item.getFromUrl(), size, state, timeString);
     }
 }

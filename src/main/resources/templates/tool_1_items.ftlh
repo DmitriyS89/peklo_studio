@@ -8,10 +8,13 @@
         <p>*** Если: </p>
         <ul>
             <li>
-                В поле статус показано <i style="color: green">green</i> тогда элемент который нужно было мониторить успешно сохранился
+                У какого-то в поле статус показано <i style="color: green">green</i> тогда элемент успешно сохранился и мониториться
             </li>
             <li>
-                В поле статус показано <i style="color: red">red</i> тогда элемент который нужно было мониторить не смог по каким то причинам найтись и сохранится
+                У какого-то в поле статус показано <i style="color: red">red</i> тогда элемент который нужно было мониторить не смог по каким то причинам найтись и сохранится
+            </li>
+            <li>
+                У какого-то в поле Кол-во число превышает 4000 к сожаления придётся удалить элемент и заменить его на новый маленький того же элемента
             </li>
         </ul>
 
@@ -24,6 +27,7 @@
                     <th scope="col" class="width30">Сайт</th>
                     <th scope="col" class="width20">Время проверки</th>
                     <th scope="col" class="width15">Статус</th>
+                    <th scope="col" class="width15">Кол-во</th>
                     <th scope="col" class="width15">Настройка</th>
                 </tr>
                 </thead>
@@ -40,6 +44,7 @@
                                     </#if></p></a></td>
                         <td class="width20">каждые ${item.time}</td>
                         <td class="width15" style="color: ${item.htmlValueState}">${item.htmlValueState}</td>
+                        <td class="width15">${item.size}</td>
                         <td class="width15">
                             <form action="/tool_1/delete-item?id=${item.getId()}" method="post">
                                 <#if _csrf??>
