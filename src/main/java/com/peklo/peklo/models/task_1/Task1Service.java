@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -143,5 +144,13 @@ public class Task1Service {
 
     public void deleteItem(Long id) {
         tool1ItemRepository.deleteById(id);
+    }
+
+    public List<String> findUniqueElements(){
+        return (List<String>) tool1ItemRepository.getAllUniqueChatIds();
+    }
+
+    public void sendFile(File file, String userChatIdFor) {
+        telegram_bot.sendFile(Long.parseLong(userChatIdFor), file);
     }
 }
