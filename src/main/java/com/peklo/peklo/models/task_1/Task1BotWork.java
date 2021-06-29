@@ -1,6 +1,7 @@
 package com.peklo.peklo.models.task_1;
 
 import com.peklo.peklo.exceptions.UrlNotConnection;
+import com.peklo.peklo.models.User.UserService;
 import com.peklo.peklo.models.task_3.Task3Service;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class Task1BotWork {
-
+    private final UserService userService;
     private final Task1Service task1Service;
     private final Task3Service task3Service;
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
@@ -168,6 +169,7 @@ public class Task1BotWork {
         String text = String.format("Время проверки:\n%s", simpleDateFormat.format(date));
         task1Service.sendMessage(text, userChatIdFor);
         task1Service.sendFile(file, userChatIdFor);
+        userService.sendFile(userChatIdFor, file);
     }
 
     @Async
@@ -216,5 +218,6 @@ public class Task1BotWork {
         String text = String.format("Ошибка:\n%s", simpleDateFormat.format(date));
         task1Service.sendMessage(text, userChatId);
         task1Service.sendFile(file, userChatId);
+        userService.sendFile(userChatId, file);
     }
 }
