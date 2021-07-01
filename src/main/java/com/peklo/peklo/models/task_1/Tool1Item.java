@@ -32,5 +32,5 @@ public class Tool1Item {
 
     private LocalDateTime localDateTime;
 
-    private String userChatId;
+    private String userAddress;
 }

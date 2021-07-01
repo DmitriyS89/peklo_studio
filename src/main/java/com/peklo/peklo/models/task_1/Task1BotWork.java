@@ -32,19 +32,18 @@ public class Task1BotWork {
     private final UserService userService;
     private final Task1Service task1Service;
     private final Task3Service task3Service;
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
     private final File file = new File("result.xlsx");
 
     @Async
     @Scheduled(fixedRate = 60000)
     public void getItems() {
         List<Tool1Item> allElements = task1Service.getAllElements();
-        List<String> userChatIds = task1Service.findUniqueElements();
+        List<String> allAddress = task1Service.findUniqueElements();
 
-        for (String userChatId : userChatIds) {
+        for (String address : allAddress) {
             List<Tool1Item> alpha = new ArrayList<>();
             for (Tool1Item item : allElements) {
-                if(item.getUserChatId().equals(userChatId)){
+                if(item.getUserAddress().equals(address)){
                     alpha.add(item);
                 }
             }
@@ -104,12 +103,13 @@ public class Task1BotWork {
 
     @Async
     protected void sendMessages(Map<Tool1Item, LinkedList<DiffMatchPatch.Diff>> diffs) {
-        String userChatIdFor = "";
+        String userAddress = "";
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet spreadsheet = workbook.createSheet("Datasets");
         XSSFRow row;
         int column = 0;
         for (Map.Entry<Tool1Item, LinkedList<DiffMatchPatch.Diff>> entry : diffs.entrySet()) {
+            if(entry.getValue().size() == 1) continue;
             row = spreadsheet.createRow(column++);
 
             Tool1Item item = entry.getKey();
@@ -117,7 +117,7 @@ public class Task1BotWork {
 
             String stringFromDiff = task1Service.getStringFromDiff(diff);
 
-            userChatIdFor = item.getUserChatId();
+            userAddress = item.getUserAddress();
             row.createCell(0).setCellValue("ID:");
             row.createCell(1).setCellValue(item.getId());
             row.createCell(2).setCellValue("Сайт:");
@@ -158,6 +158,7 @@ public class Task1BotWork {
             }
             column++;
         }
+        if(column < 1) return;
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
             workbook.write(outputStream);
@@ -165,23 +166,21 @@ public class Task1BotWork {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Date date = new Date(System.currentTimeMillis());
-        String text = String.format("Время проверки:\n%s", simpleDateFormat.format(date));
-        task1Service.sendMessage(text, userChatIdFor);
-        task1Service.sendFile(file, userChatIdFor);
-        userService.sendFile(userChatIdFor, file);
+//        task1Service.sendMessage(text, userAddress);
+//        task1Service.sendFile(file, userAddress);
+        userService.sendFile(userAddress, file);
     }
 
     @Async
     protected void checkAndFilterItems(List<Tool1Item> items, List<Tool1Item> checkedItems) {
-        String userChatId = "";
+        String userAddress = "";
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet spreadsheet = workbook.createSheet("Datasets");
         XSSFRow row;
         int count = 0;
         for (Tool1Item item : items) {
             String errors;
-            userChatId = item.getUserChatId();
+            userAddress = item.getUserAddress();
             try {
                 task3Service.getJSoupConnection(item.getFromUrl());
                 checkedItems.add(item);
@@ -214,10 +213,8 @@ public class Task1BotWork {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Date date = new Date(System.currentTimeMillis());
-        String text = String.format("Ошибка:\n%s", simpleDateFormat.format(date));
-        task1Service.sendMessage(text, userChatId);
-        task1Service.sendFile(file, userChatId);
-        userService.sendFile(userChatId, file);
+//        task1Service.sendMessage(text, userChatId);
+//        task1Service.sendFile(file, userChatId);
+        userService.sendFile(userAddress, file);
     }
 }

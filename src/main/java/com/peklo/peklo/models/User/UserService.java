@@ -21,6 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final MailSender mailSender;
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
     @Value("${hostname}")
     private String hostname;
@@ -81,13 +82,12 @@ public class UserService {
         return userRepository.getOne(aLong);
     }
 
-    public void sendFile(String chatId, File file){
-        Optional<User> userOpt = userRepository.findByChatId(chatId);
+    public void sendFile(String email, File file){
+        Optional<User> userOpt = userRepository.findByEmail(email);
         if(userOpt.isPresent()) {
             User user = userOpt.get();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
             Date date = new Date(System.currentTimeMillis());
-            String text = "Время проверки " + simpleDateFormat.format(date);
+            String text = "Привет! " + simpleDateFormat.format(date);
             mailSender.sendMailWithAttachment(user.getEmail(), "Tool 1", text, file.getAbsolutePath());
         }
     }

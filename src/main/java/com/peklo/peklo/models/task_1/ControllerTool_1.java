@@ -65,14 +65,14 @@ public class ControllerTool_1 {
         User user = userService.findByEmail(principal.getName());
         String decode = URLDecoder.decode(elements, StandardCharsets.UTF_8);
         List<String> elements1 = task1Service.getElements(decode);
-        task1Service.saveElements(document, elements1, time, user.getChatId());
+        task1Service.saveElements(document, elements1, time, user.getEmail());
         return "redirect:result?success=true";
     }
 
     @GetMapping("client-items")
     public String getClientItems(Principal principal, Model model){
         User user = userService.findByEmail(principal.getName());
-        List<Tool1ItemDto> items = task1Service.getItemsWithUserChatId(user.getChatId()).stream()
+        List<Tool1ItemDto> items = task1Service.getItemsWithUserAddress(user.getEmail()).stream()
                 .map(Tool1ItemDto::from)
                 .collect(Collectors.toList());
         model.addAttribute("clientItems", items);

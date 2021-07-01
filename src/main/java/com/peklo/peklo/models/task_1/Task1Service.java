@@ -1,7 +1,5 @@
 package com.peklo.peklo.models.task_1;
 
-import com.peklo.peklo.exceptions.UrlNotConnection;
-import com.peklo.peklo.models.task_3.Task3Service;
 import com.peklo.peklo.models.telegram_bot.Bot;
 import lombok.RequiredArgsConstructor;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
@@ -10,7 +8,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,7 +81,7 @@ public class Task1Service {
         }
     }
 
-    public void saveElements(Document document, List<String> elements, String time, String chatId) {
+    public void saveElements(Document document, List<String> elements, String time, String address) {
         for (String element : elements) {
             String newElement = element;
             if (element.startsWith("#mini-body-for-site")) {
@@ -95,7 +92,7 @@ public class Task1Service {
                     .htmlValue(document.select(newElement).toString())
                     .cssPath(newElement)
                     .time(time)
-                    .userChatId(chatId)
+                    .userAddress(address)
                     .localDateTime(LocalDateTime.now())
                     .build();
             tool1ItemRepository.save(tool1Item);
@@ -110,9 +107,9 @@ public class Task1Service {
         return tool1ItemRepository.findAll();
     }
 
-    public void sendMessage(String text, String userChatId) {
-        telegram_bot.sendMessage(userChatId, text);
-    }
+//    public void sendMessage(String text, String userChatId) {
+//        telegram_bot.sendMessage(userChatId, text);
+//    }
 
     public String getStringFromDiff(LinkedList<DiffMatchPatch.Diff> diffs){
         StringBuilder stringBuilder = new StringBuilder();
@@ -138,8 +135,8 @@ public class Task1Service {
         return diffs;
     }
 
-    public List<Tool1Item> getItemsWithUserChatId(String chatId) {
-        return (List<Tool1Item>) tool1ItemRepository.findAllByUserChatId(chatId);
+    public List<Tool1Item> getItemsWithUserAddress(String chatId) {
+        return (List<Tool1Item>) tool1ItemRepository.findAllByUserAddress(chatId);
     }
 
     public void deleteItem(Long id) {
@@ -147,10 +144,10 @@ public class Task1Service {
     }
 
     public List<String> findUniqueElements(){
-        return (List<String>) tool1ItemRepository.getAllUniqueChatIds();
+        return (List<String>) tool1ItemRepository.getAllUniqueUserAddress();
     }
 
-    public void sendFile(File file, String userChatIdFor) {
-        telegram_bot.sendFile(Long.parseLong(userChatIdFor), file);
-    }
+//    public void sendFile(File file, String userChatIdFor) {
+//        telegram_bot.sendFile(Long.parseLong(userChatIdFor), file);
+//    }
 }

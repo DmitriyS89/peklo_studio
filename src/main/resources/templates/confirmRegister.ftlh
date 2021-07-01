@@ -22,9 +22,9 @@
         <h1 class="h3 mb-3 fw-normal">Подтвердите адрес электронной почты</h1>
         <div class="form-floating">
             <#if accept == "error">
-                <input type="text" class="form-control" name="token" id="floatingInput" placeholder="Токен не найден">
+                <input type="number" pattern="[0-9]+" class="form-control" name="token" id="floatingInput" placeholder="Токен не найден">
             <#else>
-                <input type="text" class="form-control" name="token" id="floatingInput">
+                <input type="number" pattern="[0-9]+" class="form-control" name="token" id="floatingInput">
             </#if>
             <label for="floatingInput">Введите код,отправленный на вашу электронную почту</label>
         </div>
