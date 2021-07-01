@@ -18,7 +18,7 @@
 <body class="text-center">
 <main class="form-signin">
     <form action="/singup" method="post">
-        <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
+        <img class="mb-4" src="/images/PEKLO-LOGO-BLACK-500x500.png" alt="" width="150" height="150">
         <h1 class="h3 mb-3 fw-normal">Регистариция</h1>
 
         <div class="form-floating">
