@@ -38,11 +38,7 @@ public class ControllerTool_1 {
     }
 
     @GetMapping()
-    public String getTemplate(Principal principal){
-        User user = userService.findByEmail(principal.getName());
-        if(user.getChatId() == null || user.getChatId().isBlank()){
-            return "redirect:/telegram-bot/accept-telegram-account";
-        }
+    public String getTemplate(){
         return "redirect:tool_1/result";
     }
 

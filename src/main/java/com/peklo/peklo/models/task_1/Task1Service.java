@@ -1,6 +1,5 @@
 package com.peklo.peklo.models.task_1;
 
-import com.peklo.peklo.models.telegram_bot.Bot;
 import lombok.RequiredArgsConstructor;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.json.JSONArray;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 public class Task1Service {
 
     private final Tool1ItemRepository tool1ItemRepository;
-    private final Bot telegram_bot;
 
     public Html drawSite(Document doc, Boolean isScript) {
         String links = getElements(doc, isScript);
