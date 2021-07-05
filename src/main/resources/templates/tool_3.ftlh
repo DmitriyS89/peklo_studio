@@ -3,9 +3,9 @@
 <@main.renderWith>
     <h1 class="mt-4">Инструмент, определяющий открытие ссылок вне домена, в котором эта ссылка находится</h1>
     <div class="container-fluid">
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
+        <p>*** Инструмент, определяющий открытие ссылок вне домена, в котором эта ссылка находится
+            Бот сканирует сайт, который предоставляет пользователь, и выводит все ссылки, которые находятся вне доменного имени этого сайта и не открываются на новой вкладке.</p>
+        <p>*** Вставьте (любую) ссылку в поле.</p>
 
         <div class="w-100 text-danger my-4">
             <#if error == "connection">

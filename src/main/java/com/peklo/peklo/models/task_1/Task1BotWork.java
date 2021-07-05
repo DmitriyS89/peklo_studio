@@ -35,7 +35,7 @@ public class Task1BotWork {
     private final File file = new File("result.xlsx");
 
     @Async
-    @Scheduled(fixedRate = 1800000)
+    @Scheduled(fixedRate = 1200000)
     public void getItems() {
         List<Tool1Item> allElements = task1Service.getAllElements();
         List<String> allAddress = task1Service.findUniqueElements();

@@ -5,9 +5,9 @@
         определяющий дубликаты
         страниц без 301 редиректов</h1>
     <div class="container-fluid">
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
+        <p>*** Инструмент, определяющий дубликаты страниц без 301 редиректов
+            Инструмент, определяет настройку 301 редиректов в следующих случаях:</p>
+        <p>*** Вставьте (любую) ссылку в поле.</p>
 
         <div class="w-100 text-danger my-4">
             <#if error == "connection">
