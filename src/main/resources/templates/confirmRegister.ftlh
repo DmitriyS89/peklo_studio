@@ -18,13 +18,13 @@
 <body class="text-center">
 <main class="form-signin">
     <form action="/activation" method="post">
-        <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
+        <img class="mb-4" src="/images/PEKLO-LOGO-BLACK-500x500.png" alt="" width="150" height="150">
         <h1 class="h3 mb-3 fw-normal">Подтвердите адрес электронной почты</h1>
         <div class="form-floating">
             <#if accept == "error">
-                <input type="text" class="form-control" name="token" id="floatingInput" placeholder="Токен не найден">
+                <input type="number" pattern="[0-9]+" class="form-control" name="token" id="floatingInput" placeholder="Токен не найден">
             <#else>
-                <input type="text" class="form-control" name="token" id="floatingInput">
+                <input type="number" pattern="[0-9]+" class="form-control" name="token" id="floatingInput">
             </#if>
             <label for="floatingInput">Введите код,отправленный на вашу электронную почту</label>
         </div>

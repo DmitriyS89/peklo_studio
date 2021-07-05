@@ -6,8 +6,8 @@ CREATE TABLE `tool_1_items`
     `html_value`      longtext,
     `time`            varchar(255) DEFAULT NULL,
     `local_date_time` datetime     DEFAULT NULL,
-    `user_chat_id`    varchar(255) DEFAULT NULL,
+    `user_address`    varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = MyISAM
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci
+  COLLATE = utf8mb4_0900_ai_ci;

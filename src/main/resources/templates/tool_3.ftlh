@@ -3,18 +3,18 @@
 <@main.renderWith>
     <h1 class="mt-4">Инструмент, определяющий открытие ссылок вне домена, в котором эта ссылка находится</h1>
     <div class="container-fluid">
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
+        <p>*** Инструмент, определяющий открытие ссылок вне домена, в котором эта ссылка находится
+            Бот сканирует сайт, который предоставляет пользователь, и выводит все ссылки, которые находятся вне доменного имени этого сайта и не открываются на новой вкладке.</p>
+        <p>*** Вставьте (любую) ссылку в поле.</p>
 
         <div class="w-100 text-danger my-4">
             <#if error == "connection">
                 <div class="bg-warning px-2">
-                    Подключения к url не удалось!
+                    Подключение к url не удалось!
                 </div>
             <#elseif error = "not-correct">
                 <div class="bg-warning px-2">
-                    Введнённый url не правильный!
+                    Введнённый url неправильный!
                 </div>
             <#elseif error = "ok">
                 <div class="bg-success px-2 text-dark">

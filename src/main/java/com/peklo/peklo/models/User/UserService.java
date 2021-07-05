@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
@@ -19,6 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final MailSender mailSender;
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
     @Value("${hostname}")
     private String hostname;
@@ -77,5 +80,15 @@ public class UserService {
 
     public User getUser(Long aLong) {
         return userRepository.getOne(aLong);
+    }
+
+    public void sendFile(String email, File file){
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if(userOpt.isPresent()) {
+            User user = userOpt.get();
+            Date date = new Date(System.currentTimeMillis());
+            String text = "Привет! " + simpleDateFormat.format(date);
+            mailSender.sendMailWithAttachment(user.getEmail(), "Tool 1", text, file.getAbsolutePath());
+        }
     }
 }

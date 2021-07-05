@@ -19,7 +19,7 @@
 
 <main class="form-signin">
     <form  action="/login" method="post">
-        <img class="mb-4" src="/images/logo.png" alt="" width="150" height="100">
+        <img class="mb-4" src="/images/PEKLO-LOGO-BLACK-500x500.png" alt="" width="150" height="150">
         <h1 class="h3 mb-3 fw-normal">Авторизация</h1>
 
         <div class="form-floating">
@@ -37,7 +37,7 @@
 
         <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Войти</button>
         <a href="/singup" class="forgot">У вас нет аккаунта?</a>
-        <a href="/forgot" class="forgot">Забыл пароль?</a>
+        <a href="/forgot" class="forgot">Забыли пароль?</a>
         <p class="mt-5 mb-3 year">&copy;2021</p>
     </form>
 </main>

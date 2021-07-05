@@ -27,23 +27,13 @@
 
         <!-- Sidebar -->
         <div class="bg-light border-right" id="sidebar-wrapper">
-            <div class="sidebar-heading"><img style="width: 75px; height: 50px;" class="mx-auto d-block"
-                                              src="/images/logo.png"></div>
+            <div class="sidebar-heading"><img style="width: 100px; height: 100px;" class="mx-auto d-block"
+                                              src="/images/PEKLO-LOGO-BLACK-500x500.png"></div>
             <div class="list-group list-group-flush">
-                <a href="/tool_1" class="list-group-item list-group-item-action bg-light">Краулер (изменение на
-                    сайте)</a>
-                <a href="/tool_2" class="list-group-item list-group-item-action bg-light">Мониторинг и контроль ключевых
-                    слов</a>
-                <a href="/tool_3/result" class="list-group-item list-group-item-action bg-light">Инструмент,
-                    определяющий открытие
-                    ссылок
-                    вне домена, в котором эта ссылка находится</a>
-                <a href="/tool_4/result" class="list-group-item list-group-item-action bg-light">Инструмент,
-                    определяющий дубликаты
-                    страниц без 301 редиректов</a>
-                <a href="/tool_5/result" class="list-group-item list-group-item-action bg-light">Парсер подписчиков со страниц
-                    соцсетей
-                    Facebook, Instagram и ВКонтакте</a>
+                <a href="/tool_1" class="list-group-item list-group-item-action bg-light">Мониторинг изменений на сайте</a>
+                <a href="/tool_3/result" class="list-group-item list-group-item-action bg-light">Ссылки вне домена</a>
+                <a href="/tool_4/result" class="list-group-item list-group-item-action bg-light">Дубликаты страниц без 301 редиректов</a>
+                <a href="/tool_5/result" class="list-group-item list-group-item-action bg-light">Парсер подписчиков</a>
             </div>
         </div>
         <!-- /#sidebar-wrapper -->

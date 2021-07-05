@@ -21,6 +21,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 @Validated
@@ -31,6 +32,8 @@ public class UserController {
 
     private final UserService userService;
     private final TokenService tokenService;
+    private final Pattern patternNumber = Pattern.compile("\\D");
+    private final Pattern patternTouch = Pattern.compile("/[$-/:-?{-~!\"^_`\\[\\]]/");
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false, defaultValue = "false") Boolean error, Model model) {
@@ -113,14 +116,17 @@ public class UserController {
     }
 
     @PostMapping("/activation")
-    public String confirmRegister(@RequestParam Integer token) {
-        if (tokenService.findToken(token)) {
-            Token userToken = tokenService.getToken(token);
-            userService.changeUserActivate(userToken);
-            tokenService.deleteToken(userToken);
-            return "redirect:login";
-        } else
-            throw new TokenNotFound();
+    public String confirmRegister(@RequestParam String token) {
+        if(!patternNumber.matcher(token).find() && !patternTouch.matcher(token).find()) {
+            Integer tokenOpt = Integer.parseInt(token);
+            if (tokenService.findToken(tokenOpt)) {
+                Token userToken = tokenService.getToken(tokenOpt);
+                userService.changeUserActivate(userToken);
+                tokenService.deleteToken(userToken);
+                return "redirect:login";
+            }
+        }
+        throw new TokenNotFound();
     }
 
     @GetMapping("/forgot")

@@ -5,18 +5,18 @@
         определяющий дубликаты
         страниц без 301 редиректов</h1>
     <div class="container-fluid">
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
-        <p>*** There will be information of instrument</p>
+        <p>*** Инструмент, определяющий дубликаты страниц без 301 редиректов
+            Инструмент, определяет настройку 301 редиректов в следующих случаях:</p>
+        <p>*** Вставьте (любую) ссылку в поле.</p>
 
         <div class="w-100 text-danger my-4">
             <#if error == "connection">
                 <div class="bg-warning px-2">
-                    Подключения к url не удалось!
+                    Подключение к url не удалось!
                 </div>
             <#elseif error = "not-correct">
                 <div class="bg-warning px-2">
-                    Введённый url не правильный!
+                    Введённый url неправильный!
                 </div>
             <#elseif error = "ok">
                 <div class="bg-success px-2 text-dark">
@@ -45,7 +45,7 @@
         </form>
 
         <#if results ??>
-            <table class="table_col">
+            <table class="table">
                 <tr>
                     <th>#</th>
                     <th>От-Куда</th>

@@ -16,7 +16,7 @@
 <div hidden id="tool_1_modal_window" highlightedTool1="true">
     <div class="modal_window" highlightedTool1="true">
         <div class="modal_header" highlightedTool1="true">
-            <h3 highlightedTool1="true">Вы уверены своём выборе элементов?</h3>
+            <h3 highlightedTool1="true">Вы уверены в своём выборе элементов?</h3>
         </div>
         <div class="modal_body" highlightedTool1="true">
             <p highlightedTool1="true">Сайт: ${client_url} </p>

@@ -1,8 +1,12 @@
 package com.peklo.peklo.models.task_1;
 
 import com.peklo.peklo.exceptions.UrlNotConnection;
+import com.peklo.peklo.models.User.UserService;
 import com.peklo.peklo.models.task_3.Task3Service;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.jsoup.nodes.Document;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +15,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,18 +29,32 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class Task1BotWork {
-
+    private final UserService userService;
     private final Task1Service task1Service;
     private final Task3Service task3Service;
+    private final File file = new File("result.xlsx");
 
     @Async
-    @Scheduled(fixedRate = 60000)
-    public void checkItems() {
-        LocalDateTime time = LocalDateTime.now();
+    @Scheduled(fixedRate = 1200000)
+    public void getItems() {
         List<Tool1Item> allElements = task1Service.getAllElements();
+        List<String> allAddress = task1Service.findUniqueElements();
 
+        for (String address : allAddress) {
+            List<Tool1Item> alpha = new ArrayList<>();
+            for (Tool1Item item : allElements) {
+                if(item.getUserAddress().equals(address)){
+                    alpha.add(item);
+                }
+            }
+            checkItems(alpha);
+        }
+    }
+
+    @Async
+    public void checkItems(List<Tool1Item> allElements) {
+        LocalDateTime time = LocalDateTime.now();
         List<Tool1Item> results = new ArrayList<>();
-
         if (allElements.size() > 0) {
             for (Tool1Item item : allElements) {
                 LocalDateTime dateTime = item.getLocalDateTime();
@@ -49,6 +71,8 @@ public class Task1BotWork {
             changeAndSave(results);
         }
     }
+
+
 
     @Async
     public void changeAndSave(List<Tool1Item> items) {
@@ -79,71 +103,118 @@ public class Task1BotWork {
 
     @Async
     protected void sendMessages(Map<Tool1Item, LinkedList<DiffMatchPatch.Diff>> diffs) {
+        String userAddress = "";
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet spreadsheet = workbook.createSheet("Datasets");
+        XSSFRow row;
+        int column = 0;
         for (Map.Entry<Tool1Item, LinkedList<DiffMatchPatch.Diff>> entry : diffs.entrySet()) {
+            if(entry.getValue().size() == 1) continue;
+            row = spreadsheet.createRow(column++);
 
             Tool1Item item = entry.getKey();
             LinkedList<DiffMatchPatch.Diff> diff = entry.getValue();
 
             String stringFromDiff = task1Service.getStringFromDiff(diff);
-            String userChatId = item.getUserChatId();
-            task1Service.sendMessage("Время Проверки" + "_".repeat(40), userChatId);
-            task1Service.sendMessage("ID: " + item.getId(), userChatId);
-            task1Service.sendMessage("Сайт: " + item.getFromUrl(), userChatId);
-            task1Service.sendMessage("Сохранённый:", userChatId);
-            task1Service.sendMessage(item.getHtmlValue(), userChatId);
-            task1Service.sendMessage("Новое:", userChatId);
-            task1Service.sendMessage(stringFromDiff, userChatId);
+
+            userAddress = item.getUserAddress();
+            row.createCell(0).setCellValue("ID:");
+            row.createCell(1).setCellValue(item.getId());
+            row.createCell(2).setCellValue("Сайт:");
+            row.createCell(3).setCellValue(item.getFromUrl());
+
+            row = spreadsheet.createRow(column++);
+            row.createCell(0).setCellValue("Сохранённый:");
+            row.createCell(1).setCellValue(item.getHtmlValue());
+
+            row = spreadsheet.createRow(column++);
+            row.createCell(0).setCellValue("Новое:");
+            row.createCell(1).setCellValue(stringFromDiff);
 
             long count = diff.stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
             if (count == 1) {
-                task1Service.sendMessage("Не каких изменений!", userChatId);
+                row = spreadsheet.createRow(column++);
+                row.createCell(0).setCellValue("Никаких изменений!");
             } else {
                 int size = 1;
                 for (DiffMatchPatch.Diff d : diff) {
+                    row = spreadsheet.createRow(column++);
                     switch (d.operation) {
                         case DELETE:
-                            task1Service.sendMessage(size + ". Удалено:", userChatId);
-                            task1Service.sendMessage(d.text, userChatId);
+                            row.createCell(0).setCellValue(size + ". Удалено:");
+                            row.createCell(1).setCellValue(d.text);
                             break;
                         case EQUAL:
-                            task1Service.sendMessage(size + ". Без изменений:", userChatId);
-                            task1Service.sendMessage(d.text, userChatId);
+                            row.createCell(0).setCellValue(size + ". Без изменений:");
+                            row.createCell(1).setCellValue(d.text);
                             break;
                         case INSERT:
-                            task1Service.sendMessage(size + ". Добавлено:", userChatId);
-                            task1Service.sendMessage(d.text, userChatId);
+                            row.createCell(0).setCellValue(size + ". Добавлено:");
+                            row.createCell(1).setCellValue(d.text);
                             break;
                     }
                     size++;
                 }
             }
-            task1Service.sendMessage("_".repeat(50), userChatId);
+            column++;
         }
+        if(column < 1) return;
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        task1Service.sendMessage(text, userAddress);
+//        task1Service.sendFile(file, userAddress);
+        userService.sendFile(userAddress, file);
     }
 
     @Async
     protected void checkAndFilterItems(List<Tool1Item> items, List<Tool1Item> checkedItems) {
+        String userAddress = "";
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet spreadsheet = workbook.createSheet("Datasets");
+        XSSFRow row;
+        int count = 0;
         for (Tool1Item item : items) {
             String errors;
-            String userChatId = item.getUserChatId();
+            userAddress = item.getUserAddress();
             try {
                 task3Service.getJSoupConnection(item.getFromUrl());
                 checkedItems.add(item);
                 continue;
             } catch (UrlNotConnection urlNotConnection) {
                 urlNotConnection.printStackTrace();
-                errors = "1. Сайт не доступен\n2. Ошибка при загрузке сайта";
+                errors = "1. Сайт не доступен 2. Ошибка при загрузке сайта";
             } catch (IllegalArgumentException illegalArgumentException) {
                 illegalArgumentException.printStackTrace();
-                errors = "1. Не правильная ссылка\n2. Пустая ссылка";
+                errors = "1. Не правильная ссылка 2. Пустая ссылка";
             }
-            task1Service.sendMessage("Ошибка" + "_".repeat(45), userChatId);
-            task1Service.sendMessage("ID: " + item.getId(), userChatId);
-            task1Service.sendMessage("Сайт: " + item.getFromUrl(), userChatId);
-            task1Service.sendMessage("Элемент:", userChatId);
-            task1Service.sendMessage(item.getHtmlValue(), userChatId);
-            task1Service.sendMessage(String.format("Либо:\n%s", errors), userChatId);
-            task1Service.sendMessage("_".repeat(45), userChatId);
+            row = spreadsheet.createRow(count++);
+            row.createCell(0).setCellValue("ID:");
+            row.createCell(1).setCellValue(item.getId());
+            row.createCell(2).setCellValue("Сайт:");
+            row.createCell(3).setCellValue(item.getFromUrl());
+
+            row = spreadsheet.createRow(count++);
+            row.createCell(0).setCellValue("Элемент:");
+            row.createCell(1).setCellValue(item.getHtmlValue());
+            row = spreadsheet.createRow(count++);
+            row.createCell(0).setCellValue(String.format("Либо: %s", errors));
+            count++;
         }
+        if(count < 1) return;
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            workbook.write(outputStream);
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        task1Service.sendMessage(text, userChatId);
+//        task1Service.sendFile(file, userChatId);
+        userService.sendFile(userAddress, file);
     }
 }
