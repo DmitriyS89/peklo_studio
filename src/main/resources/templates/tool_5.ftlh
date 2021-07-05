@@ -71,7 +71,7 @@
                 </div>
             <#elseif success = "urlNotCorrect">
                 <div class="bg-warning px-2">
-                    Не правильная ссылка!
+                    Неправильная ссылка!
                 </div>
             <#elseif success = "false">
                 <div class="bg-warning px-2">

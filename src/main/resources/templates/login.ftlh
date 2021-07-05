@@ -37,7 +37,7 @@
 
         <button class="w-100 btn btn-lg btn-primary mb-2" type="submit">Войти</button>
         <a href="/singup" class="forgot">У вас нет аккаунта?</a>
-        <a href="/forgot" class="forgot">Забыл пароль?</a>
+        <a href="/forgot" class="forgot">Забыли пароль?</a>
         <p class="mt-5 mb-3 year">&copy;2021</p>
     </form>
 </main>

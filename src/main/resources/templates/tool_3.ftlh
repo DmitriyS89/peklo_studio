@@ -10,11 +10,11 @@
         <div class="w-100 text-danger my-4">
             <#if error == "connection">
                 <div class="bg-warning px-2">
-                    Подключения к url не удалось!
+                    Подключение к url не удалось!
                 </div>
             <#elseif error = "not-correct">
                 <div class="bg-warning px-2">
-                    Введнённый url не правильный!
+                    Введнённый url неправильный!
                 </div>
             <#elseif error = "ok">
                 <div class="bg-success px-2 text-dark">

@@ -19,7 +19,7 @@
 <main class="form-signin">
     <form action="/singup" method="post">
         <img class="mb-4" src="/images/PEKLO-LOGO-BLACK-500x500.png" alt="" width="150" height="150">
-        <h1 class="h3 mb-3 fw-normal">Регистариция</h1>
+        <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
 
         <div class="form-floating">
             <input type="email" class="form-control" name="email" id="floatingInput" placeholder="name@example.com">

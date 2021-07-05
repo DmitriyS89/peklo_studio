@@ -134,7 +134,7 @@ public class Task1BotWork {
             long count = diff.stream().filter(d -> d.operation == DiffMatchPatch.Operation.EQUAL).count();
             if (count == 1) {
                 row = spreadsheet.createRow(column++);
-                row.createCell(0).setCellValue("Не каких изменений!");
+                row.createCell(0).setCellValue("Никаких изменений!");
             } else {
                 int size = 1;
                 for (DiffMatchPatch.Diff d : diff) {
